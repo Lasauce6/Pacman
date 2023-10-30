@@ -6,9 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Client {
-    private final int WIDTH = 1250;
-    private final int HEIGHT = 725;
-    private Labyrinth labyrinth;
+    private final int WIDTH = Labyrinth.WIDTH;
+    private final int HEIGHT = Labyrinth.HEIGHT;
     private final JFrame frame = new JFrame("PacMan");
 
     public Client() {
@@ -28,15 +27,10 @@ public class Client {
     }
 
     public void game() {
-        labyrinth = new Labyrinth();
-        GamePanel gamePanel = new GamePanel(this);
+        GamePanel gamePanel = new GamePanel();
         gamePanel.setBounds(0, 0, WIDTH, HEIGHT);
         frame.setContentPane(gamePanel);
         frame.repaint();
-    }
-
-    public void drawLabyrinth(Graphics g) {
-        labyrinth.draw(g);
     }
 
     public void close() {

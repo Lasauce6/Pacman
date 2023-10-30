@@ -1,6 +1,11 @@
 package game;
 
+import game.elements.*;
+import game.utils.CollisionDetector;
+import game.utils.KeyHandler;
+
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Labyrinth {
     public static final String[] PLATEAU =
@@ -15,19 +20,19 @@ public class Labyrinth {
                     "-......--....--....--....--....--....--....--......-",
                     "------.--.--.--.--------.--.--------.--.--.--.------",
                     "     -.--.--.--.--------.--.--------.--.--.--.-     ",
-                    "     -.--.--.......-- @        --.......--.--.-     ",
-                    "     -.--.--.-----.--      @   --.-----.--.--.-     ",
+                    "     -.--.--.......--          --.......--.--.-     ",
+                    "     -.--.--.-----.--          --.-----.--.--.-     ",
                     "------.--.--.-----.--          --.-----.--.--.------",
-                    "-     .......--......     @    ......--.......     -",
+                    "      .......--......          ......--.......      ",
                     "------.--.-----.-----          -----.-----.--.------",
-                    "     -.--.-----.----- @        -----.-----.--.-     ",
+                    "     -.--.-----.-----          -----.-----.--.-     ",
                     "     -.--..........--          --..........--.-     ",
                     "     -.--.--------.--.--------.--.--------.--.-     ",
                     "------.--.--------.--.--------.--.--------.--.------",
                     "-............--..........--..........--............-",
                     "-.----.-----.--.--------.--.--------.--.-----.----.-",
                     "-.----.-----.--.--------.--.--------.--.-----.----.-",
-                    "-...--...................#....................--...-",
+                    "-...--................... ....................--...-",
                     "---.--.--.--------.--.--------.--.--------.--.--.---",
                     "---.--.--.--------.--.--------.--.--------.--.--.---",
                     "-......--....--....--....--....--....--....--......-",
@@ -40,52 +45,88 @@ public class Labyrinth {
 
     public static final int HEIGHT = NB_ROWS * WIDTH_CASE;
     public static final int WIDTH = NB_COLUMNS * WIDTH_CASE;
-    public static final int NB_CASES = NB_ROWS * NB_COLUMNS;
 
-    public static final int NB_GHOST = 4;
-    public static final int NB_ELEMENTS = NB_CASES;
+    private boolean victory = false;
 
-    private Element[] listElements;
+    private static final ArrayList<Element> listElements = new ArrayList<>();
+    private static boolean firstInput = false;
 
-    public Labyrinth () {
-        listElements = new Element[NB_ELEMENTS];
+    public Labyrinth() {
+        CollisionDetector collisionDetector = new CollisionDetector(this);
+
         for (int i = 0; i < NB_ROWS; i++) {
             for (int j = 0; j < NB_COLUMNS; j++) {
                 switch (PLATEAU[i].charAt(j)) {
                     // Case vide
                     case ' ':
-                        listElements[i * NB_COLUMNS + j] = new Case(j * WIDTH_CASE, i * WIDTH_CASE, 0, WIDTH_CASE, Id.EMPTY, Color.BLACK);
+                        listElements.add(new EmptyCase(WIDTH_CASE, j * WIDTH_CASE, i * WIDTH_CASE));
                         break;
-                    // Case avec point
+                    // PacGum
                     case '.':
-                        listElements[i * NB_COLUMNS + j] = new Case(j * WIDTH_CASE, i * WIDTH_CASE, 0, WIDTH_CASE, Id.POINT, Color.WHITE);
+                        listElements.add(new PacGum(WIDTH_CASE, j * WIDTH_CASE, i * WIDTH_CASE));
                         break;
                     // Mur
                     case '-':
-                        listElements[i * NB_COLUMNS + j] = new Case(j * WIDTH_CASE, i * WIDTH_CASE, 0, WIDTH_CASE, Id.WALL, Color.BLUE);
-                        break;
-                    // Pacman
-                    case '#':
-                        listElements[i * NB_COLUMNS + j] = new Pacman(j * WIDTH_CASE, i * WIDTH_CASE, 0, WIDTH_CASE, Color.YELLOW);
-                        break;
-                    // Fantôme
-                    case '@':
-                        listElements[i * NB_COLUMNS + j] = new Ghost(j * WIDTH_CASE, i * WIDTH_CASE, 0, WIDTH_CASE, Color.RED);
-                        break;
-                    // Pacgomme
-                    case '!':
-                        listElements[i * NB_COLUMNS + j] = new Pacgomme(j * WIDTH_CASE, i * WIDTH_CASE, 0, WIDTH_CASE, Color.WHITE);
+                        listElements.add(new Wall(WIDTH_CASE, j * WIDTH_CASE, i * WIDTH_CASE));
                         break;
                 }
             }
         }
+        // PacGum spécial
+        listElements.add(new SuperPacGum(WIDTH_CASE, 11 * WIDTH_CASE, 11 * WIDTH_CASE));
+        listElements.add(new SuperPacGum(WIDTH_CASE, 11 * WIDTH_CASE, 11 * WIDTH_CASE));
+        listElements.add(new SuperPacGum(WIDTH_CASE, 11 * WIDTH_CASE, 11 * WIDTH_CASE));
+        // Ghosts
+        listElements.add(new Ghost(WIDTH_CASE, 24 * WIDTH_CASE, 14 * WIDTH_CASE, 2,-2, 0,  Color.RED));
+        listElements.add(new Ghost(WIDTH_CASE, 25 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.CYAN));
+        listElements.add(new Ghost(WIDTH_CASE, 26 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, -2, Color.MAGENTA));
+        listElements.add(new Ghost(WIDTH_CASE, 27 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 2, 0, Color.ORANGE));
+        // Pacman
+        Pacman pacman = new Pacman(25 * WIDTH_CASE, 23 * WIDTH_CASE, 2, WIDTH_CASE);
+        listElements.add(pacman);
+        pacman.setCollisionDetector(collisionDetector);
     }
 
-    public void draw(Graphics g) {
+    public ArrayList<Element> getListElements() {
+        return listElements;
+    }
+
+    public static ArrayList<Wall> getWalls() {
+        ArrayList<Wall> walls = new ArrayList<>();
         for (Element element : listElements) {
-            if (element != null) element.draw(g);
+            if (element instanceof Wall) {
+                walls.add((Wall) element);
+            }
+        }
+        return walls;
+    }
+
+    public void render(Graphics2D g) {
+        for (Element element : listElements) {
+            if (!element.isDestroyed()) element.render(g);
         }
     }
 
+    private Pacman getPacman() {
+        return (Pacman) listElements.get(listElements.size() - 1);
+    }
+
+    public void update() {
+        for (Element element : listElements) {
+            if (!element.isDestroyed()) element.update();
+        }
+    }
+
+    public void input(KeyHandler keyHandler) {
+        getPacman().input(keyHandler);
+    }
+
+    public static void setFirstInput(boolean b) {
+        firstInput = b;
+    }
+
+    public static boolean getFirstInput() {
+        return firstInput;
+    }
 
 }

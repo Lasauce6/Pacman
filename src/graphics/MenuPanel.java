@@ -3,14 +3,17 @@ package graphics;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class MenuPanel extends Pannel {
+public class MenuPanel extends JPanel implements ActionListener {
+    private final Client client;
     private final Font font = new Font("Arial", Font.BOLD, 40);
     private final JButton start = new JButton("Start");
     private final JButton exit = new JButton("Exit");
 
     MenuPanel(Client client) {
-        super(client);
+        super();
+        this.client = client;
         setLayout(null);
         setOpaque(true);
         start.addActionListener(this);
