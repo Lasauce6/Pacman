@@ -1,17 +1,26 @@
 package game.elements;
 
 import game.Labyrinth;
+import game.Observer;
+import game.Sujet;
+import game.elements.superpacgum.SuperPacGum;
 import game.utils.CollisionDetector;
 import game.utils.Direction;
 import game.utils.KeyHandler;
 import game.utils.WallCollisionDetector;
 
 import java.awt.*;
+import java.util.ArrayList;
 
-public class Pacman extends MovingElement {
+public class Pacman extends MovingElement implements Sujet {
     CollisionDetector collisionDetector;
     private int angle = 30;
     private int arcAngle = 300;
+    private final ArrayList<Observer> observers = new ArrayList<>();
+    boolean invisible = false;
+    boolean invincible = false;
+
+
     public Pacman(int xPos, int yPos, int speed, int size) {
         super(size, xPos, yPos, speed);
         direction = Direction.RIGHT;
@@ -19,7 +28,9 @@ public class Pacman extends MovingElement {
 
     @Override
     public void render(Graphics2D g) {
-        g.setColor(Color.YELLOW);
+        if (invisible) g.setColor(new Color(122, 119, 64));
+        else if (invincible) g.setColor(Color.ORANGE);
+        else g.setColor(Color.YELLOW);
         g.fillArc(xPos, yPos, size, size, angle, 300);
     }
 
@@ -39,7 +50,17 @@ public class Pacman extends MovingElement {
 
         PacGum pg = (PacGum) collisionDetector.checkCollision(this, PacGum.class);
         if (pg != null) {
-            pg.setEaten(true);
+            notifyObserverPacGumEaten(pg);
+        }
+
+        SuperPacGum spg = (SuperPacGum) collisionDetector.checkCollision(this, SuperPacGum.class);
+        if (spg != null) {
+            notifyObserverSuperPacGumEaten(spg);
+        }
+
+        Ghost g = (Ghost) collisionDetector.checkCollision(this, Ghost.class);
+        if (g != null) {
+            notifyObserverGhostCollision(g);
         }
 
         if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) {
@@ -86,5 +107,36 @@ public class Pacman extends MovingElement {
 
     public void setCollisionDetector(CollisionDetector collisionDetector) {
         this.collisionDetector = collisionDetector;
+    }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObserverPacGumEaten(PacGum pg) {
+        for (Observer observer : observers) {
+            observer.updatePacGumEaten(pg);
+        }
+    }
+
+    @Override
+    public void notifyObserverSuperPacGumEaten(SuperPacGum spg) {
+        for (Observer observer : observers) {
+            observer.updateSuperPacGumEaten(spg);
+        }
+    }
+
+    @Override
+    public void notifyObserverGhostCollision(Ghost g) {
+        for (Observer observer : observers) {
+            observer.updateGhostCollision(g);
+        }
     }
 }

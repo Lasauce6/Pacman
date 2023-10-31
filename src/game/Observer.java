@@ -2,7 +2,7 @@ package game;
 
 import game.elements.Ghost;
 import game.elements.PacGum;
-import game.elements.SuperPacGum;
+import game.elements.superpacgum.SuperPacGum;
 
 public interface Observer {
     void updatePacGumEaten(PacGum pg);

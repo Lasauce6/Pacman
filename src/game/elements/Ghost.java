@@ -9,6 +9,8 @@ import java.util.ArrayList;
 
 public class Ghost extends MovingElement {
     private final Color color;
+    private boolean isVulnerable = false;
+    private boolean isEaten = false;
 
     public Ghost(int size, int xPos, int yPos, int speed, int xVel, int yVel, Color color) {
         super(size, xPos, yPos, speed);
@@ -27,6 +29,10 @@ public class Ghost extends MovingElement {
     @Override
     public void update() {
         if (!Labyrinth.getFirstInput()) return; // Les fantômes ne bougent pas tant que le joueur n'a pas joué
+        if (isEaten) {
+            goToBase();
+            return;
+        }
 
         int newXVel = 0;
         int newYVel = 0;
@@ -89,6 +95,7 @@ public class Ghost extends MovingElement {
                 if (!WallCollisionDetector.checkWallCollision(this, -speed, 0)) possibleDirections.add(Direction.LEFT);
             }
         }
+
         direction = possibleDirections.get((int) (Math.random() * possibleDirections.size()));
 
         switch (direction) {
@@ -112,4 +119,38 @@ public class Ghost extends MovingElement {
 
     }
 
+    private void goToBase() {
+        if (xPos == 25 * size && yPos == 14 * size) {
+            isEaten = false;
+            return;
+        }
+
+        if (xPos < 25 * size) {
+            xVel = speed;
+            yVel = 0;
+        } else if (xPos > 25 * size) {
+            xVel = -speed;
+            yVel = 0;
+        } else if (yPos < 14 * size) {
+            xVel = 0;
+            yVel = speed;
+        } else if (yPos > 14 * size) {
+            xVel = 0;
+            yVel = -speed;
+        }
+
+        if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) updatePosition();
+    }
+
+    public boolean isVulnerable() {
+        return isVulnerable;
+    }
+
+    public void setVulnerable() {
+        isVulnerable = true;
+    }
+
+    public void setEaten(boolean b) {
+        isEaten = b;
+    }
 }

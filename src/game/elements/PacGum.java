@@ -1,5 +1,7 @@
 package game.elements;
 
+import game.Labyrinth;
+
 import java.awt.*;
 
 public class PacGum extends StaticElement {
@@ -16,7 +18,7 @@ public class PacGum extends StaticElement {
     public void setEaten(boolean eaten) {
         if (eaten) {
             destroy();
-            // TODO: add score
+            Labyrinth.addScore(10);
         }
     }
 }
