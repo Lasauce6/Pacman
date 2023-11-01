@@ -1,0 +1,45 @@
+package game.elements;
+
+import java.awt.*;
+
+public abstract class Element {
+    protected int size;
+    protected int xPos;
+    protected int yPos;
+
+    protected boolean destroyed = false;
+
+    public Element(int size, int xPos, int yPos) {
+        this.size = size;
+        this.xPos = xPos;
+        this.yPos = yPos;
+    }
+
+    public void update() {}
+
+    public void render(Graphics2D g) {}
+
+    public void destroy() {
+        this.xPos = -32;
+        this.yPos = -32;
+        destroyed = true;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public int getxPos() {
+        return xPos;
+    }
+
+    public int getyPos() {
+        return yPos;
+    }
+
+    public abstract Rectangle getHitbox();
+}
