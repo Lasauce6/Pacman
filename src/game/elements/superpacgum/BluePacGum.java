@@ -16,4 +16,19 @@ public class BluePacGum  extends SuperPacGum {
             Labyrinth.addScore(100);
         }
     }
+
+    @Override
+    public void notifyObserverPacmanInvisible() {
+
+    }
+
+    @Override
+    public void notifyObserverPacmanInvincible() {
+
+    }
+
+    @Override
+    public void notifyObserverLabyrinthChange() {
+
+    }
 }

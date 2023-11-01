@@ -6,8 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Client {
-    private static final int WIDTH = Labyrinth.WIDTH;
-    private static final int HEIGHT = Labyrinth.HEIGHT + 24 * 2;
+    public static final int WIDTH = Labyrinth.WIDTH;
+    public static final int HEIGHT = Labyrinth.HEIGHT + 24 * 2;
     private static final JFrame frame = new JFrame("PacMan");
 
     public Client() {

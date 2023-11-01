@@ -30,12 +30,12 @@ public class MenuPanel extends JPanel implements ActionListener {
     private void setTitle(Graphics g) {
         g.setColor(Color.YELLOW);
         g.setFont(font);
-        g.drawString("PacMan", 500, 100);
+        g.drawString("PacMan", Client.WIDTH / 2 - 80, 100);
     }
 
     private void setButtons() {
-        start.setBounds(500, 300, 150, 50);
-        exit.setBounds(500, 400, 150, 50);
+        start.setBounds(Client.WIDTH / 2 - 75 , 300, 150, 50);
+        exit.setBounds(Client.WIDTH / 2 - 75, 400, 150, 50);
         this.add(start);
         this.add(exit);
     }

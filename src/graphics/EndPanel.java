@@ -33,13 +33,13 @@ public class EndPanel extends JPanel implements ActionListener {
     private void setTitle(Graphics g) {
         g.setColor(Color.YELLOW);
         g.setFont(font);
-        if (victory) g.drawString("Victoire", 500, 100);
-        else g.drawString("Game Over", 500, 100);
+        if (victory) g.drawString("Victoire", Client.WIDTH / 2 - 80, 100);
+        else g.drawString("Game Over", Client.WIDTH / 2 - 110, 100);
     }
 
     private void setButtons() {
-        restart.setBounds(500, 300, 150, 50);
-        menu.setBounds(500, 400, 150, 50);
+        restart.setBounds(Client.WIDTH / 2 - 75, 300, 150, 50);
+        menu.setBounds(Client.WIDTH / 2 - 75, 400, 150, 50);
         this.add(restart);
         this.add(menu);
     }

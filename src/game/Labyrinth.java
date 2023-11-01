@@ -4,42 +4,76 @@ import game.elements.*;
 import game.elements.superpacgum.*;
 import game.utils.CollisionDetector;
 import game.utils.KeyHandler;
+import graphics.GamePanel;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 public class Labyrinth implements Observer {
     public static final String[] PLATEAU =
-            {"----------------------------------------------------",
-                    "-... ........--..........--..........--........ ...-",
-                    "-.----.-----.--.--------.--.--------.--.-----.----.-",
-                    "-.----.-----.--.--------.--.--------.--.-----.----.-",
-                    "-.----.-----.--.--------.--.--------.--.-----.----.-",
-                    "-..................................................-",
-                    "-.----.--.--------.--.--------.--.--------.--.----.-",
-                    "-.----.--.--------.--.--------.--.--------.--.----.-",
-                    "-......--....--....--....--....--....--....--......-",
-                    "------.--.--.--.--------.--.--------.--.--.--.------",
-                    "     -.--.--.--.--------.--.--------.--.--.--.-     ",
-                    "     -.--.--.......--          --.......--.--.-     ",
-                    "     -.--.--.-----.--          --.-----.--.--.-     ",
-                    "------.--.--.-----.--          --.-----.--.--.------",
-                    "      .......--......          ......--.......      ",
-                    "------.--.-----.-----          -----.-----.--.------",
-                    "     -.--.-----.-----          -----.-----.--.-     ",
-                    "     -.--..........--          --..........--.-     ",
-                    "     -.--.--------.--.--------.--.--------.--.-     ",
-                    "------.--.--------.--.--------.--.--------.--.------",
-                    "-........................--........................-",
-                    "-.----.-----.--.--------.--.--------.--.-----.----.-",
-                    "-.----.-----.--.--------.--.--------.--.-----.----.-",
-                    "-...--.......--....--.... ...........--.......--...-",
-                    "---.--.--.--------.--.--------.--.--------.--.--.---",
-                    "---.--.--.--------.--.--------.--.--------.--.--.---",
-                    "-......--..........--..........--..........--.. ...-",
-                    "-.-.--.--.--------------------.--.-----------.----.-",
-                    "-.. ...--..........................................-",
-                    "----------------------------------------------------"};
+            {"----------------------------",
+                    "-............--............-",
+                    "-.----.-----.--.-----.----.-",
+                    "- ----.-----.--.-----.---- -",
+                    "-.----.-----.--.-----.----.-",
+                    "-..........................-",
+                    "-.----.--.--------.--.----.-",
+                    "-.----.--.--------.--.----.-",
+                    "-......--....--....--......-",
+                    "------.----- -- -----.------",
+                    "     -.----- -- -----.-     ",
+                    "     -.--          --.-     ",
+                    "     -.--          --.-     ",
+                    "------.--          --.------",
+                    "      ...            .      ",
+                    "------.--          --.------",
+                    "     -.--          --.-     ",
+                    "     -.--          --.-     ",
+                    "     -.-- -------- --.-     ",
+                    "------.-- -------- --.------",
+                    "-............--............-",
+                    "-.----.-----.--.-----.----.-",
+                    "-.----.-----.--.-----.----.-",
+                    "- ..--.......  .......--.. -",
+                    "---.--.--.--------.--.--.---",
+                    "---.--.--.--------.--.--.---",
+                    "-......--....--....--......-",
+                    "-.----------.--.----------.-",
+                    "-.----------.--.----------.-",
+                    "-..........................-",
+                    "----------------------------"};
+//    public static final String[] PLATEAU2 =
+//            {"------------ -- ------------",
+//                    "-............--............-",
+//                    "-.----.-----.--.-----.----.-",
+//                    "- ----.-----.--.-----.---- -",
+//                    "-.----.-----.--.-----.----.-",
+//                    "-..........................-",
+//                    "-.----.--.--------.--.----.-",
+//                    "-.----.--.--------.--.----.-",
+//                    "-......--....--....--......-",
+//                    "------.----- -- -----.------",
+//                    "     -.----- -- -----.-     ",
+//                    "     -.--          --.-     ",
+//                    "     -.--          --.-     ",
+//                    "------.--          --.------",
+//                    "      ...            .      ",
+//                    "------.--          --.------",
+//                    "     -.--          --.-     ",
+//                    "     -.--          --.-     ",
+//                    "     -.-- -------- --.-     ",
+//                    "------.-- -------- --.------",
+//                    "-............--............-",
+//                    "-.----.-----.--.-----.----.-",
+//                    "-.----.-----.--.-----.----.-",
+//                    "- ..--.......  .......--.. -",
+//                    "---.--.--.--------.--.--.---",
+//                    "---.--.--.--------.--.--.---",
+//                    "-......--....--....--......-",
+//                    "-.----------.--.----------.-",
+//                    "-.----------.--.----------.-",
+//                    "-..........................-",
+//                    "------------ -- ------------"};
     public static final int WIDTH_CASE = 24;
     public static final int NB_ROWS = PLATEAU.length;
     public static final int NB_COLUMNS = PLATEAU[0].length();
@@ -54,8 +88,10 @@ public class Labyrinth implements Observer {
     private static boolean firstInput = false;
     private static int score = 0;
     private static int lives = 3;
+    private final GamePanel gamePanel;
 
-    public Labyrinth() {
+    public Labyrinth(GamePanel gamePanel) {
+        this.gamePanel = gamePanel;
         for (int i = 0; i < NB_ROWS; i++) {
             for (int j = 0; j < NB_COLUMNS; j++) {
                 switch (PLATEAU[i].charAt(j)) {
@@ -75,21 +111,31 @@ public class Labyrinth implements Observer {
             }
         }
         // PacGum spécial
-        listElements.add(new BluePacGum(WIDTH_CASE, 47 * WIDTH_CASE, WIDTH_CASE));
-        listElements.add(new GreenPacGum(WIDTH_CASE, 3 * WIDTH_CASE, 28 * WIDTH_CASE));
-        listElements.add(new OrangePacGum(WIDTH_CASE, 4 * WIDTH_CASE, WIDTH_CASE));
-        listElements.add(new PurplePacGum(WIDTH_CASE, 47 * WIDTH_CASE, 26 * WIDTH_CASE));
+        listElements.add(new BluePacGum(WIDTH_CASE, 26 * WIDTH_CASE, 3 * WIDTH_CASE));
+        GreenPacGum greenPacGum = new GreenPacGum(WIDTH_CASE, WIDTH_CASE, 23 * WIDTH_CASE);
+        listElements.add(greenPacGum);
+        greenPacGum.registerObserver(this);
+        greenPacGum.registerObserver(gamePanel);
+        OrangePacGum orangePacGum = new OrangePacGum(WIDTH_CASE, WIDTH_CASE, 3 * WIDTH_CASE);
+        listElements.add(orangePacGum);
+        orangePacGum.registerObserver(this);
+        orangePacGum.registerObserver(gamePanel);
+        PurplePacGum purplePacGum = new PurplePacGum(WIDTH_CASE, 26 * WIDTH_CASE, 23 * WIDTH_CASE);
+        listElements.add(purplePacGum);
+        purplePacGum.registerObserver(this);
+        purplePacGum.registerObserver(gamePanel);
         // Ghosts
-        listElements.add(new Ghost(WIDTH_CASE, 24 * WIDTH_CASE, 14 * WIDTH_CASE, 2,-2, 0,  Color.RED));
-        listElements.add(new Ghost(WIDTH_CASE, 25 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.CYAN));
-        listElements.add(new Ghost(WIDTH_CASE, 26 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, -2, Color.MAGENTA));
-        listElements.add(new Ghost(WIDTH_CASE, 27 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 2, 0, Color.ORANGE));
+        listElements.add(new Ghost(WIDTH_CASE, 12 * WIDTH_CASE, 14 * WIDTH_CASE, 2,0, -2,  Color.RED));
+        listElements.add(new Ghost(WIDTH_CASE, 13 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.CYAN));
+        listElements.add(new Ghost(WIDTH_CASE, 14 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, -2, Color.MAGENTA));
+        listElements.add(new Ghost(WIDTH_CASE, 15 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.ORANGE));
         // Pacman
-        Pacman pacman = new Pacman(25 * WIDTH_CASE, 23 * WIDTH_CASE, 2, WIDTH_CASE);
+        Pacman pacman = new Pacman((int) (13.5 * WIDTH_CASE), 23 * WIDTH_CASE, 2, WIDTH_CASE);
         listElements.add(pacman);
         CollisionDetector collisionDetector = new CollisionDetector(this);
         pacman.setCollisionDetector(collisionDetector);
         pacman.registerObserver(this);
+        pacman.registerObserver(gamePanel);
     }
 
     public static void addScore(int i) {
@@ -125,8 +171,18 @@ public class Labyrinth implements Observer {
         }
     }
 
-    private Pacman getPacman() {
+    public static Pacman getPacman() {
         return (Pacman) listElements.get(listElements.size() - 1);
+    }
+
+    public static ArrayList<Ghost> getGhosts() {
+        ArrayList<Ghost> ghosts = new ArrayList<>();
+        for (Element element : listElements) {
+            if (element instanceof Ghost) {
+                ghosts.add((Ghost) element);
+            }
+        }
+        return ghosts;
     }
 
     public void update() {
@@ -136,9 +192,9 @@ public class Labyrinth implements Observer {
             score -= 5000;
         }
         for (Element element : listElements) {
-            if (!element.isDestroyed()) element.update();
-            if (element instanceof PacGum || element instanceof SuperPacGum) {
-                allPacGumsEaten = false;
+            if (!element.isDestroyed()) {
+                element.update();
+                if (element instanceof PacGum || element instanceof SuperPacGum) allPacGumsEaten = false;
             }
         }
         if (allPacGumsEaten) victory = true;
@@ -183,23 +239,46 @@ public class Labyrinth implements Observer {
         }
     }
 
+    @Override
+    public void updatePacmanInvisible() {
+        getPacman().setInvisible(true);
+    }
+
+    @Override
+    public void updatePacmanInvincible() {
+        getPacman().setInvincible(true);
+        for (Ghost ghost : getGhosts()) {
+            ghost.setVulnerable(true);
+        }
+    }
+
+    @Override
+    public void updateLabyrinthChange() {
+        listElements.set(12, new EmptyCase(WIDTH_CASE, 12 * WIDTH_CASE, WIDTH_CASE));
+        listElements.set(15, new EmptyCase(WIDTH_CASE, 15 * WIDTH_CASE, WIDTH_CASE));
+        listElements.set(listElements.size() - 5 - 4 - 13, new EmptyCase(WIDTH_CASE, 13 * WIDTH_CASE, 30 * WIDTH_CASE));
+        listElements.set(listElements.size() - 5 - 4 - 16, new EmptyCase(WIDTH_CASE, 16 * WIDTH_CASE, 30 * WIDTH_CASE));
+    }
+
     public void resetGame() {
         // Ghosts
-        listElements.set(listElements.size() - 5, new Ghost(WIDTH_CASE, 24 * WIDTH_CASE, 14 * WIDTH_CASE, 2,-2, 0,  Color.RED));
-        listElements.set(listElements.size() - 4, new Ghost(WIDTH_CASE, 25 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.CYAN));
-        listElements.set(listElements.size() - 3, new Ghost(WIDTH_CASE, 26 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, -2, Color.MAGENTA));
-        listElements.set(listElements.size() - 2, new Ghost(WIDTH_CASE, 27 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 2, 0, Color.ORANGE));
+        listElements.set(listElements.size() - 5, new Ghost(WIDTH_CASE, 12 * WIDTH_CASE, 14 * WIDTH_CASE, 2,0, -2,  Color.RED));
+        listElements.set(listElements.size() - 4, new Ghost(WIDTH_CASE, 13 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.CYAN));
+        listElements.set(listElements.size() - 3, new Ghost(WIDTH_CASE, 14 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, -2, Color.MAGENTA));
+        listElements.set(listElements.size() - 2, new Ghost(WIDTH_CASE, 15 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.ORANGE));
         // Pacman
-        Pacman pacman = new Pacman(25 * WIDTH_CASE, 23 * WIDTH_CASE, 2, WIDTH_CASE);
+        Pacman pacman = new Pacman((int) (13.5 * WIDTH_CASE), 23 * WIDTH_CASE, 2, WIDTH_CASE);
         listElements.set(listElements.size() - 1, pacman);
         CollisionDetector collisionDetector = new CollisionDetector(this);
         pacman.setCollisionDetector(collisionDetector);
         pacman.registerObserver(this);
-        firstInput = false;
+        pacman.registerObserver(gamePanel);
         gameOver = false;
+        firstInput = false;
     }
 
     public boolean isVictory() {
         return victory;
     }
+
 }

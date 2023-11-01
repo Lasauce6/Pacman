@@ -1,6 +1,7 @@
 package game.elements.superpacgum;
 
 import game.Labyrinth;
+import game.Observer;
 
 import java.awt.*;
 
@@ -14,7 +15,23 @@ public class PurplePacGum extends SuperPacGum {
         if (b) {
             destroy();
             Labyrinth.addScore(300);
-            // TODO : Pacman invisible
+            notifyObserverPacmanInvisible();
         }
+    }
+    @Override
+    public void notifyObserverPacmanInvisible() {
+        for (Observer observer : observers) {
+            observer.updatePacmanInvisible();
+        }
+    }
+
+    @Override
+    public void notifyObserverPacmanInvincible() {
+
+    }
+
+    @Override
+    public void notifyObserverLabyrinthChange() {
+
     }
 }

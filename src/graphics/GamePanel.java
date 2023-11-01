@@ -1,6 +1,10 @@
 package graphics;
 
 import game.Labyrinth;
+import game.Observer;
+import game.elements.Ghost;
+import game.elements.PacGum;
+import game.elements.superpacgum.SuperPacGum;
 import game.utils.KeyHandler;
 
 import javax.swing.*;
@@ -10,13 +14,15 @@ import java.awt.image.BufferedImage;
 
 import static java.lang.Thread.sleep;
 
-public class GamePanel extends JPanel implements Runnable {
+public class GamePanel extends JPanel implements Runnable, Observer {
     private final Client client;
     private static Thread thread;
     private static boolean running = false;
     private BufferedImage img;
     private Graphics2D graphics2D;
     private KeyHandler keyHandler;
+    private boolean pacmanInvisible = false;
+    private boolean pacmanInvincible = false;
     private static Labyrinth labyrinth;
     public GamePanel(Client client) {
         super();
@@ -73,7 +79,7 @@ public class GamePanel extends JPanel implements Runnable {
             return false;
         };
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
-        labyrinth = new Labyrinth();
+        labyrinth = new Labyrinth(this);
     }
 
     public void update() {
@@ -83,7 +89,6 @@ public class GamePanel extends JPanel implements Runnable {
     public void input(KeyHandler keyHandler) {
         labyrinth.input(keyHandler);
     }
-
 
     @Override
     public void run() {
@@ -103,6 +108,9 @@ public class GamePanel extends JPanel implements Runnable {
         int lastSecondTime = (int) (lastUpdateTime / 1000000000);
         int oldFrameCount = 0;
 
+        int invisibleTime = 10;
+        int invincibleTime = 10;
+
         while (running) {
             if (labyrinth.isGameOver()) {
                 if (labyrinth.getLives() > 0) labyrinth.resetGame();
@@ -111,6 +119,7 @@ public class GamePanel extends JPanel implements Runnable {
                     client.gameOver();
                 }
             } else if (labyrinth.isVictory()) {
+                running = false;
                 client.victory();
             } else {
                 double now = System.nanoTime();
@@ -133,6 +142,23 @@ public class GamePanel extends JPanel implements Runnable {
 
                 int thisSecond = (int) (lastUpdateTime / 1000000000);
                 if (thisSecond > lastSecondTime) {
+                    if (pacmanInvisible) {
+                        invisibleTime--;
+                        if (invisibleTime == 0) {
+                            Labyrinth.getPacman().setInvisible(false);
+                            pacmanInvisible = false;
+                        }
+                    }
+                    if (pacmanInvincible) {
+                        invincibleTime--;
+                        if (invincibleTime == 0) {
+                            Labyrinth.getPacman().setInvincible(false);
+                            for (Ghost ghost : Labyrinth.getGhosts()) {
+                                ghost.setVulnerable(false);
+                            }
+                            pacmanInvincible = false;
+                        }
+                    }
                     if (frameCount != oldFrameCount) {
                         System.out.println("FPS : " + frameCount);
                         oldFrameCount = frameCount;
@@ -155,5 +181,35 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
         }
+    }
+
+    @Override
+    public void updatePacGumEaten(PacGum pg) {
+
+    }
+
+    @Override
+    public void updateSuperPacGumEaten(SuperPacGum spg) {
+
+    }
+
+    @Override
+    public void updateGhostCollision(Ghost gh) {
+
+    }
+
+    @Override
+    public void updatePacmanInvisible() {
+        pacmanInvisible = true;
+    }
+
+    @Override
+    public void updatePacmanInvincible() {
+        pacmanInvincible = true;
+    }
+
+    @Override
+    public void updateLabyrinthChange() {
+
     }
 }

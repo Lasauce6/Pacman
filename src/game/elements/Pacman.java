@@ -42,6 +42,7 @@ public class Pacman extends MovingElement implements Sujet {
             case LEFT -> angle = 210;
             case RIGHT -> angle = 30;
         }
+
         if (arcAngle == 300) {
             arcAngle = 350;
         } else {
@@ -59,7 +60,7 @@ public class Pacman extends MovingElement implements Sujet {
         }
 
         Ghost g = (Ghost) collisionDetector.checkCollision(this, Ghost.class);
-        if (g != null) {
+        if (g != null && !invisible) {
             notifyObserverGhostCollision(g);
         }
 
@@ -139,4 +140,28 @@ public class Pacman extends MovingElement implements Sujet {
             observer.updateGhostCollision(g);
         }
     }
+
+    @Override
+    public void notifyObserverPacmanInvisible() {
+
+    }
+
+    @Override
+    public void notifyObserverPacmanInvincible() {
+
+    }
+
+    @Override
+    public void notifyObserverLabyrinthChange() {
+
+    }
+
+    public void setInvisible(boolean b) {
+        invisible = b;
+    }
+
+    public void setInvincible(boolean b) {
+        invincible = b;
+    }
+
 }

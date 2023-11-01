@@ -65,20 +65,5 @@ public abstract class MovingElement extends Element {
         return new Rectangle(xPos, yPos, size, size);
     }
 
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public void setxVel(int xVel) {
-        this.xVel = xVel;
-    }
-
-    public void setyVel(int yVel) {
-        this.yVel = yVel;
-    }
 }
 
