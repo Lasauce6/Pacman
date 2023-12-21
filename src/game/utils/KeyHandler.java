@@ -7,36 +7,58 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class KeyHandler
+ */
 public class KeyHandler implements KeyListener {
 
-    public static List<Key> keys = new ArrayList<>();
+    public static List<Key> keys = new ArrayList<>(); // La liste des touches
 
-public static class Key {
-        public boolean isPressed;
+    /**
+     * Class Key
+     */
+    public static class Key {
+            public boolean isPressed; // Si la touche est pressée
 
-        public Key() {
-            keys.add(this);
-        }
+            /**
+             * Constructeur de Key
+             */
+            public Key() {
+                keys.add(this);
+            }
 
-        public void toggle(boolean pressed) {
-            if (pressed != isPressed) {
-                isPressed = pressed;
+            /**
+             * Méthode qui permet de changer si la touche est pressée ou non
+             * @param pressed vrai si la touche est pressée, faux sinon
+             */
+            public void toggle(boolean pressed) {
+                if (pressed != isPressed) {
+                    isPressed = pressed;
+                }
             }
         }
-    }
 
-    public Key k_up = new Key();
+    public Key k_up = new Key(); // La touche pour aller en haut
 
-    public Key k_down = new Key();
+    public Key k_down = new Key(); // La touche pour aller en bas
 
-    public Key k_left = new Key();
+    public Key k_left = new Key(); // La touche pour aller à gauche
 
-    public Key k_right = new Key();
+    public Key k_right = new Key(); // La touche pour aller à droite
 
+    /**
+     * Constructeur de KeyHandler
+     * @param game le panel du jeu
+     */
     public KeyHandler(GamePanel game) {
         game.addKeyListener(this);
     }
 
+    /**
+     * Méthode qui permet de changer si une touche est pressée ou non
+     * @param e l'évènement de la touche
+     * @param pressed vrai si la touche est pressée, faux sinon
+     */
     public void toggle(KeyEvent e, boolean pressed) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_Q) {
             k_left.toggle(pressed);

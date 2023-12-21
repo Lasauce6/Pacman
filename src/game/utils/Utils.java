@@ -1,5 +1,8 @@
 package game.utils;
 
+/**
+ * Class Utils
+ */
 public class Utils {
 
     //Fonction pour obtenir la distance entre deux points

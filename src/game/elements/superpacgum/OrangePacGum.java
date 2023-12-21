@@ -5,6 +5,9 @@ import game.Observer;
 
 import java.awt.*;
 
+/**
+ * Class OrangePacGum
+ */
 public class OrangePacGum extends SuperPacGum {
     public OrangePacGum(int size, int xPos, int yPos) {
         super(size, xPos, yPos, Color.ORANGE);

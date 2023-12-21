@@ -14,16 +14,24 @@ import java.awt.image.BufferedImage;
 
 import static java.lang.Thread.sleep;
 
+/**
+ * Class GamePanel
+ */
 public class GamePanel extends JPanel implements Runnable, Observer {
-    private final Client client;
-    private static Thread thread;
-    private static boolean running = false;
-    private BufferedImage img;
-    private Graphics2D graphics2D;
-    private KeyHandler keyHandler;
-    private boolean pacmanInvisible = false;
-    private boolean pacmanInvincible = false;
-    private static Labyrinth labyrinth;
+    private final Client client; // Le client
+    private static Thread thread; // Le thread
+    private static boolean running = false; // true si le jeu est en cours, false sinon
+    private BufferedImage img; // L'image
+    private Graphics2D graphics2D; // Le graphics
+    private KeyHandler keyHandler; // Le keyHandler
+    private boolean pacmanInvisible = false; // true si pacman est invisible, false sinon
+    private boolean pacmanInvincible = false; // true si pacman est invincible, false sinon
+    private static Labyrinth labyrinth; // Le labyrinthe
+
+    /**
+     * Constructeur
+     * @param client le client
+     */
     public GamePanel(Client client) {
         super();
         setLayout(null);
@@ -33,6 +41,9 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         this.client = client;
     }
 
+    /**
+     * Méthode qui fait un rendu de la fenêtre
+     */
     public void render() {
         if (graphics2D != null) {
             graphics2D.setColor(Color.BLACK);
@@ -46,6 +57,9 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         }
     }
 
+    /**
+     * Méthode qui dessine l'image pour chaque fps
+     */
     public void draw() {
         Graphics g = this.getGraphics();
         if (g != null) {
@@ -54,6 +68,9 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         }
     }
 
+    /**
+     * Méthode qui permet de lancer le thread du jeu
+     */
     @Override
     public void addNotify() {
         super.addNotify();
@@ -65,6 +82,9 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         }
     }
 
+    /**
+     * Méthode qui initialise le jeu
+     */
     public void init() {
         running = true;
         img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -82,14 +102,24 @@ public class GamePanel extends JPanel implements Runnable, Observer {
         labyrinth = new Labyrinth(this);
     }
 
+    /**
+     * Méthode qui met à jour le jeu
+     */
     public void update() {
         labyrinth.update();
     }
 
+    /**
+     * Méthode qui gère les entrées clavier
+     * @param keyHandler le keyHandler
+     */
     public void input(KeyHandler keyHandler) {
         labyrinth.input(keyHandler);
     }
 
+    /**
+     * Le thread du jeu
+     */
     @Override
     public void run() {
         //Pour faire en sorte que le jeu tourne à 60FPS (tutoriel consulté : https://www.youtube.com/watch?v=LhUN3EKZiio)

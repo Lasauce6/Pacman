@@ -9,8 +9,11 @@ import graphics.GamePanel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Classe représentant le labyrinthe
+ */
 public class Labyrinth implements Observer {
-    public static final String[] PLATEAU =
+    public static final String[] PLATEAU = // Le labyrinthe est représenté par un tableau de String
             {"----------------------------",
                     "-............--............-",
                     "-.----.-----.--.-----.----.-",
@@ -42,7 +45,7 @@ public class Labyrinth implements Observer {
                     "-.----------.--.----------.-",
                     "-..........................-",
                     "----------------------------"};
-//    public static final String[] PLATEAU2 =
+//    public static final String[] PLATEAU2 = // Le labyrinthe lors du changement de labyrinthe
 //            {"------------ -- ------------",
 //                    "-............--............-",
 //                    "-.----.-----.--.-----.----.-",
@@ -74,22 +77,26 @@ public class Labyrinth implements Observer {
 //                    "-.----------.--.----------.-",
 //                    "-..........................-",
 //                    "------------ -- ------------"};
-    public static final int WIDTH_CASE = 24;
-    public static final int NB_ROWS = PLATEAU.length;
-    public static final int NB_COLUMNS = PLATEAU[0].length();
+    public static final int WIDTH_CASE = 24; // La taille d'une case
+    public static final int NB_ROWS = PLATEAU.length; // Le nombre de lignes
+    public static final int NB_COLUMNS = PLATEAU[0].length(); // Le nombre de colonnes
 
-    public static final int HEIGHT = NB_ROWS * WIDTH_CASE;
-    public static final int WIDTH = NB_COLUMNS * WIDTH_CASE;
+    public static final int HEIGHT = NB_ROWS * WIDTH_CASE; // La hauteur du labyrinthe
+    public static final int WIDTH = NB_COLUMNS * WIDTH_CASE; // La largeur du labyrinthe
 
-    private boolean victory = false;
-    private static boolean gameOver = false;
+    private boolean victory = false; // Si le joueur a gagné
+    private static boolean gameOver = false; // Si le joueur a perdu
 
-    private static final ArrayList<Element> listElements = new ArrayList<>();
-    private static boolean firstInput = false;
-    private static int score = 0;
-    private static int lives = 3;
-    private final GamePanel gamePanel;
+    private static final ArrayList<Element> listElements = new ArrayList<>(); // La liste des éléments du labyrinthe
+    private static boolean firstInput = false; // Si le joueur a fait son premier input
+    private static int score = 0; // Le score du joueur
+    private static int lives = 3; // Le nombre de vies du joueur
+    private final GamePanel gamePanel; // Le GamePanel
 
+    /**
+     * Constructeur de la classe Labyrinth
+     * @param gamePanel Le GamePanel
+     */
     public Labyrinth(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
         for (int i = 0; i < NB_ROWS; i++) {
@@ -138,23 +145,42 @@ public class Labyrinth implements Observer {
         pacman.registerObserver(gamePanel);
     }
 
+    /**
+     * Méthode permettant d'ajouter des points au score
+     * @param i Le nombre de points à ajouter
+     */
     public static void addScore(int i) {
         score = score + i;
     }
 
+    /**
+     * Méthode permettant de retirer une vie au joueur
+     */
     public void gameOver() {
         lives--;
         gameOver = true;
     }
 
+    /**
+     * Méthode permettant de savoir si le joueur a perdu
+     * @return Si le joueur a perdu
+     */
     public boolean isGameOver() {
         return gameOver;
     }
 
+    /**
+     * Méthode permettant de récupérer la liste des éléments du labyrinthe
+     * @return La liste des éléments du labyrinthe
+     */
     public ArrayList<Element> getListElements() {
         return listElements;
     }
 
+    /**
+     * Méthode permettant de récupérer la liste des murs du labyrinthe
+     * @return La liste des murs du labyrinthe
+     */
     public static ArrayList<Wall> getWalls() {
         ArrayList<Wall> walls = new ArrayList<>();
         for (Element element : listElements) {
@@ -165,16 +191,28 @@ public class Labyrinth implements Observer {
         return walls;
     }
 
+    /**
+     * Méthode permettant d'actualiser les éléments du labyrinthe
+     * @param g Le Graphics2D
+     */
     public void render(Graphics2D g) {
         for (Element element : listElements) {
             if (!element.isDestroyed()) element.render(g);
         }
     }
 
+    /**
+     * Méthode permettant de récupérer le Pacman
+     * @return Le Pacman
+     */
     public static Pacman getPacman() {
-        return (Pacman) listElements.get(listElements.size() - 1);
+        return (Pacman) listElements.getLast();
     }
 
+    /**
+     * Méthode permettant de récupérer les Ghosts
+     * @return Les Ghosts
+     */
     public static ArrayList<Ghost> getGhosts() {
         ArrayList<Ghost> ghosts = new ArrayList<>();
         for (Element element : listElements) {
@@ -185,6 +223,9 @@ public class Labyrinth implements Observer {
         return ghosts;
     }
 
+    /**
+     * Méthode permettant d'actualiser tout les éléments du labyrinthe et de vérifier si le joueur a gagné
+     */
     public void update() {
         boolean allPacGumsEaten = true;
         if (score >= 5000) {
@@ -200,36 +241,68 @@ public class Labyrinth implements Observer {
         if (allPacGumsEaten) victory = true;
     }
 
+    /**
+     * Méthode permettant de passer l'input au Pacman
+     * @param keyHandler Le KeyHandler
+     */
     public void input(KeyHandler keyHandler) {
         getPacman().input(keyHandler);
     }
 
+    /**
+     * Méthode permettant de changer le boolean firstInput
+     * @param b Le nouveau boolean firstInput
+     */
     public static void setFirstInput(boolean b) {
         firstInput = b;
     }
 
+    /**
+     * Méthode permettant de récupérer le boolean firstInput
+     * @return Le boolean firstInput
+     */
     public static boolean getFirstInput() {
         return firstInput;
     }
 
+    /**
+     * Méthode permettant de récupérer le score
+     * @return Le score
+     */
     public int getScore() {
         return score;
     }
 
+    /**
+     * Méthode permettant de récupérer le nombre de vies
+     * @return Le nombre de vies
+     */
     public int getLives() {
         return lives;
     }
 
+    /**
+     * Méthode permettant de mettre à jour le PacGum
+     * @param pg Le PacGum
+     */
     @Override
     public void updatePacGumEaten(PacGum pg) {
         pg.setEaten(true);
     }
 
+    /**
+     * Méthode permettant de mettre à jour le SuperPacGum
+     * @param spg Le SuperPacGum
+     */
     @Override
     public void updateSuperPacGumEaten(SuperPacGum spg) {
         spg.setEaten(true);
     }
 
+    /**
+     * Méthode permettant de mettre à jour le Ghost
+     * @param gh Le Ghost
+     */
     @Override
     public void updateGhostCollision(Ghost gh) {
         if (gh.isVulnerable()) {
@@ -239,11 +312,17 @@ public class Labyrinth implements Observer {
         }
     }
 
+    /**
+     * Méthode permettant de mettre rendre le Pacman invisible
+     */
     @Override
     public void updatePacmanInvisible() {
         getPacman().setInvisible(true);
     }
 
+    /**
+     * Méthode permettant de mettre rendre le Pacman invincible
+     */
     @Override
     public void updatePacmanInvincible() {
         getPacman().setInvincible(true);
@@ -252,6 +331,9 @@ public class Labyrinth implements Observer {
         }
     }
 
+    /**
+     * Méthode permettant de mettre à jour le changement de labyrinthe
+     */
     @Override
     public void updateLabyrinthChange() {
         listElements.set(12, new EmptyCase(WIDTH_CASE, 12 * WIDTH_CASE, WIDTH_CASE));
@@ -260,6 +342,9 @@ public class Labyrinth implements Observer {
         listElements.set(listElements.size() - 5 - 4 - 16, new EmptyCase(WIDTH_CASE, 16 * WIDTH_CASE, 30 * WIDTH_CASE));
     }
 
+    /**
+     * Méthode permettant de réinitialiser le jeu
+     */
     public void resetGame() {
         // Ghosts
         listElements.set(listElements.size() - 5, new Ghost(WIDTH_CASE, 12 * WIDTH_CASE, 14 * WIDTH_CASE, 2,0, -2,  Color.RED));
@@ -277,6 +362,10 @@ public class Labyrinth implements Observer {
         firstInput = false;
     }
 
+    /**
+     * Méthode permettant de savoir si le joueur a gagné
+     * @return Si le joueur a gagné
+     */
     public boolean isVictory() {
         return victory;
     }

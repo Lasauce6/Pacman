@@ -8,12 +8,25 @@ import game.utils.WallCollisionDetector;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Class Ghost
+ */
 public class Ghost extends MovingElement {
-    private final Color color;
-    private boolean isVulnerable = false;
-    private boolean isEaten = false;
-    private final int vulnerableSpeed;
+    private final Color color; // La couleur du fantôme
+    private boolean isVulnerable = false; // Le fantôme est vulnérable
+    private boolean isEaten = false; // Le fantôme est mangé
+    private final int vulnerableSpeed; // La vitesse du fantôme quand il est vulnérable
 
+    /**
+     * Constructeur de Ghost
+     * @param size la taille du fantôme
+     * @param xPos la position en x du fantôme
+     * @param yPos la position en y du fantôme
+     * @param speed la vitesse du fantôme
+     * @param xVel la vitesse en x du fantôme
+     * @param yVel la vitesse en y du fantôme
+     * @param color la couleur du fantôme
+     */
     public Ghost(int size, int xPos, int yPos, int speed, int xVel, int yVel, Color color) {
         super(size, xPos, yPos, speed);
         this.xVel = xVel;
@@ -23,6 +36,10 @@ public class Ghost extends MovingElement {
         updateDirection();
     }
 
+    /**
+     * Méthode qui permet de créer l'affichage du fantôme
+     * @param g l'objet graphique
+     */
     @Override
     public void render(Graphics2D g) {
         if (isEaten) g.setColor(Color.WHITE);
@@ -31,6 +48,9 @@ public class Ghost extends MovingElement {
         g.fillOval(xPos, yPos, size, size);
     }
 
+    /**
+     * Méthode qui permet de mettre à jour le fantôme
+     */
     @Override
     public void update() {
         if (!Labyrinth.getFirstInput()) return; // Les fantômes ne bougent pas tant que le joueur n'a pas joué
@@ -81,6 +101,9 @@ public class Ghost extends MovingElement {
         if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) updatePosition();
     }
 
+    /**
+     * Méthode qui permet de mettre à jour la direction du fantôme
+     */
     private void findNewDirection() {
         int actualSpeed = speed;
         if (isVulnerable) actualSpeed = vulnerableSpeed;
@@ -132,6 +155,9 @@ public class Ghost extends MovingElement {
 
     }
 
+    /**
+     * Méthode qui permet de faire aller le fantôme à la base
+     */
     private void goToBase() {
         int targetX = 14 * size;
         int targetY = 14 * size;
@@ -179,15 +205,27 @@ public class Ghost extends MovingElement {
         if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) updatePosition();
     }
 
+    /**
+     * Méthode qui permet de récupérer si le fantôme est vulnérable
+     * @return vrai si le fantôme est vulnérable, faux sinon
+     */
     public boolean isVulnerable() {
         return isVulnerable;
     }
 
+    /**
+     * Méthode qui permet de changer la vulnérabilité du fantôme
+     * @param b vrai si le fantôme est vulnérable, faux sinon
+     */
     public void setVulnerable(boolean b) {
         if (isVulnerable == b) return;
         isVulnerable = b;
     }
 
+    /**
+     * Méthode qui permet de changer si le fantôme est mangé
+     * @param b vrai si le fantôme est mangé, faux sinon
+     */
     public void setEaten(boolean b) {
         isEaten = b;
     }

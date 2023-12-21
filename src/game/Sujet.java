@@ -1,5 +1,8 @@
 package game;
 
+/**
+ * Interface Sujet
+ */
 public interface Sujet {
     void registerObserver(Observer observer);
     void removeObserver(Observer observer);
