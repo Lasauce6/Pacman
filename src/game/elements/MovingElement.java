@@ -1,7 +1,9 @@
 package game.elements;
 
 import game.Labyrinth;
+import game.utils.CollisionDetector;
 import game.utils.Direction;
+import game.utils.WallCollisionDetector;
 
 import java.awt.*;
 
@@ -93,5 +95,44 @@ public abstract class MovingElement extends Element {
         return new Rectangle(xPos, yPos, size, size);
     }
 
+    /**
+     * Méthode qui permet de récupérer la vitesse de l'élément
+     * @return la vitesse de l'élément
+     */
+    public int getSpd() {
+        return speed;
+    }
+
+    /**
+     * Méthode qui permet de récupérer la vitesse en x de l'élément
+     * @return la vitesse en x de l'élément
+     */
+    public int getxVel() {
+        return xVel;
+    }
+
+    /**
+     * Méthode qui permet de récupérer la vitesse en y de l'élément
+     * @return la vitesse en y de l'élément
+     */
+    public int getyVel() {
+        return yVel;
+    }
+
+    /**
+     * Méthode qui permet de changer la vitesse en x de l'élément
+     * @param xVel la nouvelle vitesse en x de l'élément
+     */
+    public void setxVel(int xVel) {
+        this.xVel = xVel;
+    }
+
+    /**
+     * Méthode qui permet de changer la vitesse en y de l'élément
+     * @param yVel la nouvelle vitesse en y de l'élément
+     */
+    public void setyVel(int yVel) {
+        this.yVel = yVel;
+    }
 }
 

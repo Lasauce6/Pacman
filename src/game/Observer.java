@@ -13,5 +13,7 @@ public interface Observer {
     void updateGhostCollision(Ghost gh);
     void updatePacmanInvisible();
     void updatePacmanInvincible();
+    void timerPacmanInvisibleOver();
+    void timerPacmanInvincibleOver();
     void updateLabyrinthChange();
 }

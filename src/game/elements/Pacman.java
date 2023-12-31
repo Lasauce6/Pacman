@@ -4,6 +4,10 @@ import game.Labyrinth;
 import game.Observer;
 import game.Sujet;
 import game.elements.superpacgum.SuperPacGum;
+import game.pacmanStates.InvincibleMode;
+import game.pacmanStates.InvisibleMode;
+import game.pacmanStates.NormalMode;
+import game.pacmanStates.PacmanState;
 import game.utils.CollisionDetector;
 import game.utils.Direction;
 import game.utils.KeyHandler;
@@ -15,13 +19,19 @@ import java.util.ArrayList;
 /**
  * Classe Pacman
  */
-public class Pacman extends MovingElement implements Sujet {
+public class Pacman extends MovingElement implements Sujet, Observer {
+    private PacmanState state; // L'état du Pacman
+    private final PacmanState invisibleMode; // Lorsque le Pacman est invisible
+    private final PacmanState invincibleMode; // Lorsque le Pacman est invincible
+    private final PacmanState normalMode; // Lorsque le Pacman est normal
+    private int invisibleTimer = 0; // Timer pour le mode invisible
+    private int invincibleTimer = 0; // Timer pour le mode invincible
     CollisionDetector collisionDetector; // Le Pacman doit pouvoir détecter les collisions avec les PacGum et les SuperPacGum
     private int angle = 30; // Angle de la bouche du Pacman
     private int arcAngle = 300;
     private final ArrayList<Observer> observers = new ArrayList<>(); // Liste des observateurs
-    boolean invisible = false; // Pacman est invisible
-    boolean invincible = false; // Pacman est invincible
+    private final int initialXPos; // La position en x initiale du Pacman
+    private final int initialYPos; // La position en y initiale du Pacman
 
     /**
      * Constructeur de Pacman
@@ -33,7 +43,21 @@ public class Pacman extends MovingElement implements Sujet {
     public Pacman(int xPos, int yPos, int speed, int size) {
         super(size, xPos, yPos, speed);
         direction = Direction.RIGHT;
+
+        initialXPos = xPos;
+        initialYPos = yPos;
+
+        invisibleMode = new InvisibleMode(this);
+        invincibleMode = new InvincibleMode(this);
+        normalMode = new NormalMode(this);
+
+        state = normalMode;
     }
+
+    // Méthodes pour changer les états du Pacman
+    public void switchInvisibleMode() {state = invisibleMode;}
+    public void switchInvincibleMode() {state = invincibleMode;}
+    public void switchNormalMode() {state = normalMode;}
 
     /**
      * Méthode qui permet de dessiner le Pacman
@@ -41,8 +65,8 @@ public class Pacman extends MovingElement implements Sujet {
      */
     @Override
     public void render(Graphics2D g) {
-        if (invisible) g.setColor(new Color(122, 119, 64));
-        else if (invincible) g.setColor(Color.ORANGE);
+        if (state == invisibleMode) g.setColor(new Color(122, 119, 64));
+        else if (state == invincibleMode) g.setColor(Color.ORANGE);
         else g.setColor(Color.YELLOW);
         g.fillArc(xPos, yPos, size, size, angle, 300);
     }
@@ -52,6 +76,24 @@ public class Pacman extends MovingElement implements Sujet {
      */
     @Override
     public void update() {
+        // TODO: Gestion du timer pour les modes invisibles et invincibles et changement d'état
+        if (state == invisibleMode) {
+            invisibleTimer++;
+            if (invisibleTimer >= (60 * 10)) {
+                state.timerOver();
+                invisibleTimer = 0;
+                notifyObserverTimerPacmanInvisibleOver();
+            }
+        } else if (state == invincibleMode) {
+            invincibleTimer++;
+            if (invincibleTimer >= (60 * 10)) {
+                state.timerOver();
+                invincibleTimer = 0;
+                notifyObserverTimerPacmanInvincibleOver();
+            }
+        }
+
+
         switch (direction) {
             case UP -> angle = 110;
             case DOWN -> angle = 300;
@@ -76,7 +118,7 @@ public class Pacman extends MovingElement implements Sujet {
         }
 
         Ghost g = (Ghost) collisionDetector.checkCollision(this, Ghost.class);
-        if (g != null && !invisible) {
+        if (g != null && state != invisibleMode) {
             notifyObserverGhostCollision(g);
         }
 
@@ -109,7 +151,7 @@ public class Pacman extends MovingElement implements Sujet {
         }
 
         if (newYVel == 0 && newXVel == 0) return;
-        if (!Labyrinth.getFirstInput()) Labyrinth.setFirstInput(true);
+        if (!Labyrinth.getFirstInput()) Labyrinth.setFirstInput(true); // TODO: changer avec un observer
 
 
         if (Math.abs(newXVel) != Math.abs(newYVel)) {
@@ -198,7 +240,26 @@ public class Pacman extends MovingElement implements Sujet {
      */
     @Override
     public void notifyObserverPacmanInvincible() {
+    }
 
+    /**
+     * Méthode qui notifie les observateurs que le timer du mode invincible est terminé
+     */
+    @Override
+    public void notifyObserverTimerPacmanInvincibleOver() {
+        for (Observer observer : observers) {
+            observer.timerPacmanInvincibleOver();
+        }
+    }
+
+    /**
+     * Méthode qui notifie les observateurs que le timer du mode invisible est terminé
+     */
+    @Override
+    public void notifyObserverTimerPacmanInvisibleOver() {
+        for (Observer observer : observers) {
+            observer.timerPacmanInvisibleOver();
+        }
     }
 
     /**
@@ -209,20 +270,52 @@ public class Pacman extends MovingElement implements Sujet {
 
     }
 
-    /**
-     * Méthode qui permet de rendre le Pacman invisible
-     * @param b true si le Pacman doit être invisible, false sinon
-     */
-    public void setInvisible(boolean b) {
-        invisible = b;
+    public void reset() {
+        xPos = initialXPos;
+        yPos = initialYPos;
+        xVel = 0;
+        yVel = 0;
+        direction = Direction.RIGHT;
+        state = normalMode;
     }
 
-    /**
-     * Méthode qui permet de rendre le Pacman invincible
-     * @param b true si le Pacman doit être invincible, false sinon
-     */
-    public void setInvincible(boolean b) {
-        invincible = b;
+    @Override
+    public void updatePacGumEaten(PacGum pg) {
+
     }
 
+    @Override
+    public void updateSuperPacGumEaten(SuperPacGum spg) {
+
+    }
+
+    @Override
+    public void updateGhostCollision(Ghost gh) {
+
+    }
+
+    @Override
+    public void updatePacmanInvisible() {
+
+    }
+
+    @Override
+    public void updatePacmanInvincible() {
+
+    }
+
+    @Override
+    public void timerPacmanInvisibleOver() {
+
+    }
+
+    @Override
+    public void timerPacmanInvincibleOver() {
+
+    }
+
+    @Override
+    public void updateLabyrinthChange() {
+
+    }
 }

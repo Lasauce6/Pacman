@@ -4,7 +4,6 @@ import game.elements.*;
 import game.elements.superpacgum.*;
 import game.utils.CollisionDetector;
 import game.utils.KeyHandler;
-import graphics.GamePanel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -26,11 +25,9 @@ public class Labyrinth implements Observer {
                     "------.----- -- -----.------",
                     "     -.----- -- -----.-     ",
                     "     -.--          --.-     ",
-                    "     -.--          --.-     ",
-                    "------.--          --.------",
-                    "      ...            .      ",
-                    "------.--          --.------",
-                    "     -.--          --.-     ",
+                    "------.-- ---  --- --.------",
+                    "      .   --    --   .      ",
+                    "------.-- -------- --.------",
                     "     -.--          --.-     ",
                     "     -.-- -------- --.-     ",
                     "------.-- -------- --.------",
@@ -58,11 +55,9 @@ public class Labyrinth implements Observer {
 //                    "------.----- -- -----.------",
 //                    "     -.----- -- -----.-     ",
 //                    "     -.--          --.-     ",
-//                    "     -.--          --.-     ",
-//                    "------.--          --.------",
-//                    "      ...            .      ",
-//                    "------.--          --.------",
-//                    "     -.--          --.-     ",
+//                    "------.-- ---  --- --.------",
+//                    "      .   --    --   .      ",
+//                    "------.-- -------- --.------",
 //                    "     -.--          --.-     ",
 //                    "     -.-- -------- --.-     ",
 //                    "------.-- -------- --.------",
@@ -86,19 +81,18 @@ public class Labyrinth implements Observer {
 
     private boolean victory = false; // Si le joueur a gagné
     private static boolean gameOver = false; // Si le joueur a perdu
-
+    private final ArrayList<Ghost> listGhosts = new ArrayList<>();
+    private final ArrayList<SuperPacGum> listSuperPacGum = new ArrayList<>(); // La liste des super PacGum
     private static final ArrayList<Element> listElements = new ArrayList<>(); // La liste des éléments du labyrinthe
     private static boolean firstInput = false; // Si le joueur a fait son premier input
     private static int score = 0; // Le score du joueur
     private static int lives = 3; // Le nombre de vies du joueur
-    private final GamePanel gamePanel; // Le GamePanel
 
     /**
      * Constructeur de la classe Labyrinth
-     * @param gamePanel Le GamePanel
      */
-    public Labyrinth(GamePanel gamePanel) {
-        this.gamePanel = gamePanel;
+    public Labyrinth() { // TODO: diviser en plusieurs méthodes
+        // Le GamePanel
         for (int i = 0; i < NB_ROWS; i++) {
             for (int j = 0; j < NB_COLUMNS; j++) {
                 switch (PLATEAU[i].charAt(j)) {
@@ -117,32 +111,67 @@ public class Labyrinth implements Observer {
                 }
             }
         }
+        // Murs pour la maison des fantômes
+        listElements.add(new Wall(WIDTH_CASE, (int) (12.5 *  WIDTH_CASE), 12 * WIDTH_CASE));
+        listElements.add(new Wall(WIDTH_CASE, (int) (14.5 * WIDTH_CASE), 12 * WIDTH_CASE));
+
+        // Murs invisibles pour évider de sortir du labyrinthe et pour éviter les bugs
+        listElements.add(new InvisibleWall(WIDTH_CASE, 11 * WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 13 * WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 14 * WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 16 * WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 11 * WIDTH_CASE, HEIGHT));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 13 * WIDTH_CASE, HEIGHT));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 14 * WIDTH_CASE, HEIGHT));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 16 * WIDTH_CASE, HEIGHT));
+        listElements.add(new InvisibleWall(WIDTH_CASE, -WIDTH_CASE, 12 * WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, -WIDTH_CASE, 14 * WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, WIDTH, 12 * WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, WIDTH, 14 * WIDTH_CASE));
+
+
         // PacGum spécial
         listElements.add(new BluePacGum(WIDTH_CASE, 26 * WIDTH_CASE, 3 * WIDTH_CASE));
-        GreenPacGum greenPacGum = new GreenPacGum(WIDTH_CASE, WIDTH_CASE, 23 * WIDTH_CASE);
+        GreenPacGum greenPacGum = new GreenPacGum(WIDTH_CASE, WIDTH_CASE, 21 * WIDTH_CASE);
         listElements.add(greenPacGum);
         greenPacGum.registerObserver(this);
-        greenPacGum.registerObserver(gamePanel);
         OrangePacGum orangePacGum = new OrangePacGum(WIDTH_CASE, WIDTH_CASE, 3 * WIDTH_CASE);
         listElements.add(orangePacGum);
         orangePacGum.registerObserver(this);
-        orangePacGum.registerObserver(gamePanel);
-        PurplePacGum purplePacGum = new PurplePacGum(WIDTH_CASE, 26 * WIDTH_CASE, 23 * WIDTH_CASE);
+        PurplePacGum purplePacGum = new PurplePacGum(WIDTH_CASE, 26 * WIDTH_CASE, 21 * WIDTH_CASE);
         listElements.add(purplePacGum);
         purplePacGum.registerObserver(this);
-        purplePacGum.registerObserver(gamePanel);
         // Ghosts
-        listElements.add(new Ghost(WIDTH_CASE, 12 * WIDTH_CASE, 14 * WIDTH_CASE, 2,0, -2,  Color.RED));
-        listElements.add(new Ghost(WIDTH_CASE, 13 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.CYAN));
-        listElements.add(new Ghost(WIDTH_CASE, 14 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, -2, Color.MAGENTA));
-        listElements.add(new Ghost(WIDTH_CASE, 15 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.ORANGE));
+        Ghost redGhost = new Ghost(WIDTH_CASE, 12 * WIDTH_CASE, 13 * WIDTH_CASE, 2, Color.RED);
+        listElements.add(redGhost);
+        listGhosts.add(redGhost);
+        Ghost cyanGhost = new Ghost(WIDTH_CASE, 13 * WIDTH_CASE, 13 * WIDTH_CASE, 2, Color.CYAN);
+        listElements.add(cyanGhost);
+        listGhosts.add(cyanGhost);
+        Ghost magentaGhost = new Ghost(WIDTH_CASE, 14 * WIDTH_CASE, 13 * WIDTH_CASE, 2, Color.MAGENTA);
+        listElements.add(magentaGhost);
+        listGhosts.add(magentaGhost);
+        Ghost orangeGhost = new Ghost(WIDTH_CASE, 15 * WIDTH_CASE, 13 * WIDTH_CASE, 2, Color.ORANGE);
+        listElements.add(orangeGhost);
+        listGhosts.add(orangeGhost);
         // Pacman
-        Pacman pacman = new Pacman((int) (13.5 * WIDTH_CASE), 23 * WIDTH_CASE, 2, WIDTH_CASE);
+        Pacman pacman = new Pacman((int) (13.5 * WIDTH_CASE), 21 * WIDTH_CASE, 2, WIDTH_CASE);
         listElements.add(pacman);
+
         CollisionDetector collisionDetector = new CollisionDetector(this);
         pacman.setCollisionDetector(collisionDetector);
+
         pacman.registerObserver(this);
-        pacman.registerObserver(gamePanel);
+        for (Ghost ghost : listGhosts) {
+            pacman.registerObserver(ghost);
+            orangePacGum.registerObserver(ghost);
+            purplePacGum.registerObserver(ghost);
+        }
+
+        orangePacGum.registerObserver(pacman);
+        purplePacGum.registerObserver(pacman);
+
+        //TODO : Mettre les observers à la fin agencés de manière intelligente
     }
 
     /**
@@ -210,21 +239,7 @@ public class Labyrinth implements Observer {
     }
 
     /**
-     * Méthode permettant de récupérer les Ghosts
-     * @return Les Ghosts
-     */
-    public static ArrayList<Ghost> getGhosts() {
-        ArrayList<Ghost> ghosts = new ArrayList<>();
-        for (Element element : listElements) {
-            if (element instanceof Ghost) {
-                ghosts.add((Ghost) element);
-            }
-        }
-        return ghosts;
-    }
-
-    /**
-     * Méthode permettant d'actualiser tout les éléments du labyrinthe et de vérifier si le joueur a gagné
+     * Méthode permettant d'actualiser tous les éléments du labyrinthe et de vérifier si le joueur a gagné
      */
     public void update() {
         boolean allPacGumsEaten = true;
@@ -305,31 +320,32 @@ public class Labyrinth implements Observer {
      */
     @Override
     public void updateGhostCollision(Ghost gh) {
-        if (gh.isVulnerable()) {
-            gh.setEaten(true);
-        } else {
+        if (!gh.isEaten() && !gh.isVulnerable()) {
             gameOver();
         }
     }
 
     /**
-     * Méthode permettant de mettre rendre le Pacman invisible
+     * Méthode permettant de rendre le Pacman invisible
      */
     @Override
     public void updatePacmanInvisible() {
-        getPacman().setInvisible(true);
+        getPacman().switchInvisibleMode();
     }
 
     /**
-     * Méthode permettant de mettre rendre le Pacman invincible
+     * Méthode permettant de rendre le Pacman invincible
      */
     @Override
     public void updatePacmanInvincible() {
-        getPacman().setInvincible(true);
-        for (Ghost ghost : getGhosts()) {
-            ghost.setVulnerable(true);
-        }
+        getPacman().switchInvincibleMode();
     }
+
+    @Override
+    public void timerPacmanInvisibleOver() {}
+
+    @Override
+    public void timerPacmanInvincibleOver() {}
 
     /**
      * Méthode permettant de mettre à jour le changement de labyrinthe
@@ -338,28 +354,22 @@ public class Labyrinth implements Observer {
     public void updateLabyrinthChange() {
         listElements.set(12, new EmptyCase(WIDTH_CASE, 12 * WIDTH_CASE, WIDTH_CASE));
         listElements.set(15, new EmptyCase(WIDTH_CASE, 15 * WIDTH_CASE, WIDTH_CASE));
-        listElements.set(listElements.size() - 5 - 4 - 13, new EmptyCase(WIDTH_CASE, 13 * WIDTH_CASE, 30 * WIDTH_CASE));
-        listElements.set(listElements.size() - 5 - 4 - 16, new EmptyCase(WIDTH_CASE, 16 * WIDTH_CASE, 30 * WIDTH_CASE));
+        listElements.set(listElements.size() - 5 - 4 - 12 - 13 - 2, new EmptyCase(WIDTH_CASE, 13 * WIDTH_CASE, 30 * WIDTH_CASE));
+        listElements.set(listElements.size() - 5 - 4 - 12 - 16 - 2, new EmptyCase(WIDTH_CASE, 16 * WIDTH_CASE, 30 * WIDTH_CASE));
     }
 
     /**
      * Méthode permettant de réinitialiser le jeu
      */
     public void resetGame() {
-        // Ghosts
-        listElements.set(listElements.size() - 5, new Ghost(WIDTH_CASE, 12 * WIDTH_CASE, 14 * WIDTH_CASE, 2,0, -2,  Color.RED));
-        listElements.set(listElements.size() - 4, new Ghost(WIDTH_CASE, 13 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.CYAN));
-        listElements.set(listElements.size() - 3, new Ghost(WIDTH_CASE, 14 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, -2, Color.MAGENTA));
-        listElements.set(listElements.size() - 2, new Ghost(WIDTH_CASE, 15 * WIDTH_CASE, 14 * WIDTH_CASE, 2, 0, 2, Color.ORANGE));
-        // Pacman
-        Pacman pacman = new Pacman((int) (13.5 * WIDTH_CASE), 23 * WIDTH_CASE, 2, WIDTH_CASE);
-        listElements.set(listElements.size() - 1, pacman);
-        CollisionDetector collisionDetector = new CollisionDetector(this);
-        pacman.setCollisionDetector(collisionDetector);
-        pacman.registerObserver(this);
-        pacman.registerObserver(gamePanel);
-        gameOver = false;
         firstInput = false;
+        // Ghosts
+        for (Ghost ghost : listGhosts) {
+            ghost.reset();
+        }
+        // Pacman
+        getPacman().reset();
+        gameOver = false;
     }
 
     /**

@@ -33,6 +33,16 @@ public class GreenPacGum extends SuperPacGum {
     }
 
     @Override
+    public void notifyObserverTimerPacmanInvincibleOver() {
+
+    }
+
+    @Override
+    public void notifyObserverTimerPacmanInvisibleOver() {
+
+    }
+
+    @Override
     public void notifyObserverLabyrinthChange() {
         for (Observer observer : observers) {
             observer.updateLabyrinthChange();

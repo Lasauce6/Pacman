@@ -7,7 +7,7 @@ import java.awt.*;
 /**
  * Class BluePacGum
  */
-public class BluePacGum  extends SuperPacGum {
+public class BluePacGum extends SuperPacGum {
     public BluePacGum(int size, int xPos, int yPos) {
         super(size, xPos, yPos, Color.BLUE);
     }
@@ -21,17 +21,17 @@ public class BluePacGum  extends SuperPacGum {
     }
 
     @Override
-    public void notifyObserverPacmanInvisible() {
-
-    }
+    public void notifyObserverPacmanInvisible() {}
 
     @Override
-    public void notifyObserverPacmanInvincible() {
-
-    }
+    public void notifyObserverPacmanInvincible() {}
 
     @Override
-    public void notifyObserverLabyrinthChange() {
+    public void notifyObserverTimerPacmanInvincibleOver() {}
 
-    }
+    @Override
+    public void notifyObserverTimerPacmanInvisibleOver() {}
+
+    @Override
+    public void notifyObserverLabyrinthChange() {}
 }

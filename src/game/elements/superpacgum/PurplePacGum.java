@@ -29,12 +29,14 @@ public class PurplePacGum extends SuperPacGum {
     }
 
     @Override
-    public void notifyObserverPacmanInvincible() {
-
-    }
+    public void notifyObserverPacmanInvincible() {}
 
     @Override
-    public void notifyObserverLabyrinthChange() {
+    public void notifyObserverTimerPacmanInvincibleOver() {}
 
-    }
+    @Override
+    public void notifyObserverTimerPacmanInvisibleOver() {}
+
+    @Override
+    public void notifyObserverLabyrinthChange() {}
 }

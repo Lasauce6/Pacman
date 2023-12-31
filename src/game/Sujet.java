@@ -11,5 +11,7 @@ public interface Sujet {
     void notifyObserverGhostCollision(game.elements.Ghost g);
     void notifyObserverPacmanInvisible();
     void notifyObserverPacmanInvincible();
+    void notifyObserverTimerPacmanInvincibleOver();
+    void notifyObserverTimerPacmanInvisibleOver();
     void notifyObserverLabyrinthChange();
 }

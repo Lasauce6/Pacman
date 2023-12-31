@@ -1,21 +1,25 @@
 package game.elements;
 
 import game.Labyrinth;
-import game.utils.Direction;
-import game.utils.Utils;
-import game.utils.WallCollisionDetector;
+import game.Observer;
+import game.elements.superpacgum.SuperPacGum;
+import game.ghostStates.*;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
  * Class Ghost
  */
-public class Ghost extends MovingElement {
+public class Ghost extends MovingElement implements Observer {
+    private GhostState state; // L'état du fantôme
+    private final GhostState chaseMode; // Le mode de poursuite du fantôme
+    private final GhostState eatenMode; // Lorsque le fantôme est mangé
+    private final GhostState frightenedMode; // Lorsque le fantôme est effrayé
+    private final GhostState houseMode; // Lorsque le fantôme est dans la maison
     private final Color color; // La couleur du fantôme
-    private boolean isVulnerable = false; // Le fantôme est vulnérable
-    private boolean isEaten = false; // Le fantôme est mangé
     private final int vulnerableSpeed; // La vitesse du fantôme quand il est vulnérable
+    private final int initialXPos; // La position en x initiale du fantôme
+    private final int initialYPos; // La position en y initiale du fantôme
 
     /**
      * Constructeur de Ghost
@@ -23,18 +27,48 @@ public class Ghost extends MovingElement {
      * @param xPos la position en x du fantôme
      * @param yPos la position en y du fantôme
      * @param speed la vitesse du fantôme
-     * @param xVel la vitesse en x du fantôme
-     * @param yVel la vitesse en y du fantôme
      * @param color la couleur du fantôme
      */
-    public Ghost(int size, int xPos, int yPos, int speed, int xVel, int yVel, Color color) {
+    public Ghost(int size, int xPos, int yPos, int speed, Color color) {
         super(size, xPos, yPos, speed);
-        this.xVel = xVel;
-        this.yVel = yVel;
+
+        chaseMode = new ChaseMode(this);
+        eatenMode = new EatenMode(this);
+        frightenedMode = new FrightenedMode(this);
+        houseMode = new HouseMode(this);
+
+        state = houseMode;
+
+        initialXPos = xPos;
+        initialYPos = yPos;
+
+        this.xVel = 0;
+        this.yVel = 0;
         this.color = color;
         this.vulnerableSpeed = speed / 2;
         updateDirection();
     }
+
+
+    // Méthodes pour changer les états du fantôme
+    public void switchChaseMode() {
+        state = chaseMode;
+    }
+    public void switchEatenMode() {
+        state = eatenMode;
+    }
+    public void switchFrightenedMode() {
+        state = frightenedMode;
+    }
+    public void switchHouseMode() {
+        state = houseMode;
+    }
+
+    /**
+     * Méthode qui permet de récupérer l'état du fantôme
+     * @return l'état du fantôme
+     */
+    public GhostState getGhostState() {return state;}
 
     /**
      * Méthode qui permet de créer l'affichage du fantôme
@@ -42,8 +76,8 @@ public class Ghost extends MovingElement {
      */
     @Override
     public void render(Graphics2D g) {
-        if (isEaten) g.setColor(Color.WHITE);
-        else if (isVulnerable) g.setColor(Color.BLUE);
+        if (state == eatenMode) g.setColor(Color.WHITE);
+        else if (state == frightenedMode) g.setColor(Color.BLUE);
         else g.setColor(color);
         g.fillOval(xPos, yPos, size, size);
     }
@@ -54,155 +88,21 @@ public class Ghost extends MovingElement {
     @Override
     public void update() {
         if (!Labyrinth.getFirstInput()) return; // Les fantômes ne bougent pas tant que le joueur n'a pas joué
-        if (isEaten) {
-            goToBase();
-            if (xPos == 14 * size && yPos == 14 * size) {
-                isEaten = false;
-                isVulnerable = false;
-            }
-            return;
-        }
-        int actualSpeed = speed;
-        if (isVulnerable) actualSpeed = vulnerableSpeed;
-
-        int newXVel = 0;
-        int newYVel = 0;
 
         if (!onGameplayWindow()) return;
 
-        if (direction == Direction.LEFT && !WallCollisionDetector.checkWallCollision(this, -actualSpeed, 0)) {
-            newXVel = -actualSpeed;
-        }
-        if (direction == Direction.RIGHT && !WallCollisionDetector.checkWallCollision(this, actualSpeed, 0)) {
-            newXVel = actualSpeed;
-        }
-        if (direction == Direction.UP && !WallCollisionDetector.checkWallCollision(this, 0, -actualSpeed)) {
-            newYVel = -actualSpeed;
-        }
-        if (direction == Direction.DOWN && !WallCollisionDetector.checkWallCollision(this, 0, actualSpeed)) {
-            newYVel = actualSpeed;
+        if (xPos > 10 * size && xPos < 17 * size && yPos > 12 * size && yPos < 14 * size && state == eatenMode) {
+            state.insideHouse();
+        } else if (xPos > 12 * size && xPos < 15 * size && yPos > 10 * size && yPos < 12 * size && state == houseMode) {
+            state.outsideHouse();
         }
 
-        if (newYVel == 0 && newXVel == 0) findNewDirection();
+        if (state == frightenedMode) speed = vulnerableSpeed;
+        else speed = 2 * vulnerableSpeed;
 
-        if (Math.abs(newXVel) != Math.abs(newYVel)) {
-            xVel = newXVel;
-            yVel = newYVel;
-        } else {
-            if (xVel != 0) {
-                xVel = 0;
-                yVel = newYVel;
-            } else {
-                xVel = newXVel;
-                yVel = 0;
-            }
-        }
-
-        if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) updatePosition();
-    }
-
-    /**
-     * Méthode qui permet de mettre à jour la direction du fantôme
-     */
-    private void findNewDirection() {
-        int actualSpeed = speed;
-        if (isVulnerable) actualSpeed = vulnerableSpeed;
-        ArrayList<Direction> possibleDirections = new ArrayList<>();
-
-        switch (direction) {
-            case UP -> {
-                if (!WallCollisionDetector.checkWallCollision(this, -actualSpeed, 0)) possibleDirections.add(Direction.LEFT);
-                if (!WallCollisionDetector.checkWallCollision(this, actualSpeed, 0)) possibleDirections.add(Direction.RIGHT);
-                if (!WallCollisionDetector.checkWallCollision(this, 0, actualSpeed)) possibleDirections.add(Direction.DOWN);
-            }
-            case DOWN -> {
-                if (!WallCollisionDetector.checkWallCollision(this, -actualSpeed, 0)) possibleDirections.add(Direction.LEFT);
-                if (!WallCollisionDetector.checkWallCollision(this, actualSpeed, 0)) possibleDirections.add(Direction.RIGHT);
-                if (!WallCollisionDetector.checkWallCollision(this, 0, -actualSpeed)) possibleDirections.add(Direction.UP);
-            }
-            case LEFT -> {
-                if (!WallCollisionDetector.checkWallCollision(this, 0, -actualSpeed)) possibleDirections.add(Direction.UP);
-                if (!WallCollisionDetector.checkWallCollision(this, 0, actualSpeed)) possibleDirections.add(Direction.DOWN);
-                if (!WallCollisionDetector.checkWallCollision(this, actualSpeed, 0)) possibleDirections.add(Direction.RIGHT);
-            }
-            case RIGHT -> {
-                if (!WallCollisionDetector.checkWallCollision(this, 0, -actualSpeed)) possibleDirections.add(Direction.UP);
-                if (!WallCollisionDetector.checkWallCollision(this, 0, actualSpeed)) possibleDirections.add(Direction.DOWN);
-                if (!WallCollisionDetector.checkWallCollision(this, -actualSpeed, 0)) possibleDirections.add(Direction.LEFT);
-            }
-        }
-
-        direction = possibleDirections.get((int) (Math.random() * possibleDirections.size()));
-
-        switch (direction) {
-            case UP -> {
-                xVel = 0;
-                yVel = -actualSpeed;
-            }
-            case DOWN -> {
-                xVel = 0;
-                yVel = actualSpeed;
-            }
-            case LEFT -> {
-                xVel = -actualSpeed;
-                yVel = 0;
-            }
-            case RIGHT -> {
-                xVel = actualSpeed;
-                yVel = 0;
-            }
-        }
-
-    }
-
-    /**
-     * Méthode qui permet de faire aller le fantôme à la base
-     */
-    private void goToBase() {
-        int targetX = 14 * size;
-        int targetY = 14 * size;
-
-        int newXVel = 0;
-        int newYVel = 0;
-
-        double minDist = Double.MAX_VALUE;
-
-        if (xVel <= 0 && !WallCollisionDetector.checkWallCollision(this, -speed, 0)) {
-            double distance = Utils.getDistance(xPos - speed, yPos, targetX, targetY);
-            if (distance < minDist) {
-                newXVel = -speed;
-                minDist = distance;
-            }
-        }
-        if (xVel >= 0 && !WallCollisionDetector.checkWallCollision(this, speed, 0)) {
-            double distance = Utils.getDistance(xPos + speed, yPos,  targetX, targetY);
-            if (distance < minDist) {
-                newXVel = speed;
-                minDist = distance;
-            }
-        }
-        if (yVel <= 0 && !WallCollisionDetector.checkWallCollision(this, 0, -speed)) {
-            double distance = Utils.getDistance(xPos, yPos - speed, targetX, targetY);
-            if (distance < minDist) {
-                newXVel = 0;
-                newYVel = -speed;
-                minDist = distance;
-            }
-        }
-        if (yVel >= 0 && !WallCollisionDetector.checkWallCollision(this, 0, speed)) {
-            double distance = Utils.getDistance(xPos, yPos + speed, targetX, targetY);
-            if (distance < minDist) {
-                newXVel = 0;
-                newYVel = speed;
-            }
-        }
-
-        if (newXVel == 0 && newYVel == 0) return;
-
-        xVel = (newXVel);
-        yVel = (newYVel);
-
-        if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) updatePosition();
+        // Le fantôme calcule sa nouvelle position et est mis à jour
+        state.getNextDirection();
+        updatePosition();
     }
 
     /**
@@ -210,23 +110,54 @@ public class Ghost extends MovingElement {
      * @return vrai si le fantôme est vulnérable, faux sinon
      */
     public boolean isVulnerable() {
-        return isVulnerable;
+        return state == frightenedMode;
     }
 
     /**
-     * Méthode qui permet de changer la vulnérabilité du fantôme
-     * @param b vrai si le fantôme est vulnérable, faux sinon
+     * Méthode qui permet de récupérer si le fantôme est mangé
+     * @return vrai si le fantôme est mangé, faux sinon
      */
-    public void setVulnerable(boolean b) {
-        if (isVulnerable == b) return;
-        isVulnerable = b;
+    public boolean isEaten() {
+        return state == eatenMode;
     }
 
-    /**
-     * Méthode qui permet de changer si le fantôme est mangé
-     * @param b vrai si le fantôme est mangé, faux sinon
-     */
-    public void setEaten(boolean b) {
-        isEaten = b;
+    @Override
+    public void updatePacGumEaten(PacGum pg) {}
+
+    @Override
+    public void updateSuperPacGumEaten(SuperPacGum spg) {}
+
+    @Override
+    public void updateGhostCollision(Ghost gh) {
+        if (state == frightenedMode && gh == this) {
+            state.eaten();
+        }
+    }
+
+    @Override
+    public void updatePacmanInvisible() {}
+
+    @Override
+    public void updatePacmanInvincible() {
+        switchFrightenedMode();
+    }
+
+    @Override
+    public void timerPacmanInvisibleOver() {}
+
+    @Override
+    public void timerPacmanInvincibleOver() {
+        state.timerFrightenedModeOver();
+    }
+
+    @Override
+    public void updateLabyrinthChange() {}
+
+    public void reset() {
+        xPos = initialXPos;
+        yPos = initialYPos;
+        state = houseMode;
+        xVel = 0;
+        yVel = 0;
     }
 }

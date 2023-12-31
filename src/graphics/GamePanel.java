@@ -1,10 +1,6 @@
 package graphics;
 
 import game.Labyrinth;
-import game.Observer;
-import game.elements.Ghost;
-import game.elements.PacGum;
-import game.elements.superpacgum.SuperPacGum;
 import game.utils.KeyHandler;
 
 import javax.swing.*;
@@ -17,15 +13,13 @@ import static java.lang.Thread.sleep;
 /**
  * Class GamePanel
  */
-public class GamePanel extends JPanel implements Runnable, Observer {
+public class GamePanel extends JPanel implements Runnable {
     private final Client client; // Le client
     private static Thread thread; // Le thread
     private static boolean running = false; // true si le jeu est en cours, false sinon
     private BufferedImage img; // L'image
     private Graphics2D graphics2D; // Le graphics
     private KeyHandler keyHandler; // Le keyHandler
-    private boolean pacmanInvisible = false; // true si pacman est invisible, false sinon
-    private boolean pacmanInvincible = false; // true si pacman est invincible, false sinon
     private static Labyrinth labyrinth; // Le labyrinthe
 
     /**
@@ -99,7 +93,7 @@ public class GamePanel extends JPanel implements Runnable, Observer {
             return false;
         };
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
-        labyrinth = new Labyrinth(this);
+        labyrinth = new Labyrinth();
     }
 
     /**
@@ -172,23 +166,6 @@ public class GamePanel extends JPanel implements Runnable, Observer {
 
                 int thisSecond = (int) (lastUpdateTime / 1000000000);
                 if (thisSecond > lastSecondTime) {
-                    if (pacmanInvisible) {
-                        invisibleTime--;
-                        if (invisibleTime == 0) {
-                            Labyrinth.getPacman().setInvisible(false);
-                            pacmanInvisible = false;
-                        }
-                    }
-                    if (pacmanInvincible) {
-                        invincibleTime--;
-                        if (invincibleTime == 0) {
-                            Labyrinth.getPacman().setInvincible(false);
-                            for (Ghost ghost : Labyrinth.getGhosts()) {
-                                ghost.setVulnerable(false);
-                            }
-                            pacmanInvincible = false;
-                        }
-                    }
                     if (frameCount != oldFrameCount) {
                         System.out.println("FPS : " + frameCount);
                         oldFrameCount = frameCount;
@@ -211,35 +188,5 @@ public class GamePanel extends JPanel implements Runnable, Observer {
             }
 
         }
-    }
-
-    @Override
-    public void updatePacGumEaten(PacGum pg) {
-
-    }
-
-    @Override
-    public void updateSuperPacGumEaten(SuperPacGum spg) {
-
-    }
-
-    @Override
-    public void updateGhostCollision(Ghost gh) {
-
-    }
-
-    @Override
-    public void updatePacmanInvisible() {
-        pacmanInvisible = true;
-    }
-
-    @Override
-    public void updatePacmanInvincible() {
-        pacmanInvincible = true;
-    }
-
-    @Override
-    public void updateLabyrinthChange() {
-
     }
 }

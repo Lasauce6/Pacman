@@ -64,16 +64,13 @@ public abstract class SuperPacGum extends StaticElement implements Sujet {
      * Méthode qui permet de notifier les observateurs que le PacGum a été mangé
      */
     @Override
-    public void notifyObserverPacGumEaten(game.elements.PacGum pg) {
-    }
+    public void notifyObserverPacGumEaten(game.elements.PacGum pg) {}
 
     /**
      * Méthode qui permet de notifier les observateurs que le SuperPacGum a été mangé
      */
     @Override
-    public void notifyObserverSuperPacGumEaten(SuperPacGum spg) {
-    }
+    public void notifyObserverSuperPacGumEaten(SuperPacGum spg) {}
     @Override
-    public void notifyObserverGhostCollision(game.elements.Ghost g) {
-    }
+    public void notifyObserverGhostCollision(game.elements.Ghost g) {}
 }
