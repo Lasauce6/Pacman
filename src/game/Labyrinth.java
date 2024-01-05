@@ -116,18 +116,16 @@ public class Labyrinth implements Observer {
         listElements.add(new Wall(WIDTH_CASE, (int) (14.5 * WIDTH_CASE), 12 * WIDTH_CASE));
 
         // Murs invisibles pour évider de sortir du labyrinthe et pour éviter les bugs
-        listElements.add(new InvisibleWall(WIDTH_CASE, 11 * WIDTH_CASE, -WIDTH_CASE));
-        listElements.add(new InvisibleWall(WIDTH_CASE, 13 * WIDTH_CASE, -WIDTH_CASE));
-        listElements.add(new InvisibleWall(WIDTH_CASE, 14 * WIDTH_CASE, -WIDTH_CASE));
-        listElements.add(new InvisibleWall(WIDTH_CASE, 16 * WIDTH_CASE, -WIDTH_CASE));
-        listElements.add(new InvisibleWall(WIDTH_CASE, 11 * WIDTH_CASE, HEIGHT));
-        listElements.add(new InvisibleWall(WIDTH_CASE, 13 * WIDTH_CASE, HEIGHT));
-        listElements.add(new InvisibleWall(WIDTH_CASE, 14 * WIDTH_CASE, HEIGHT));
-        listElements.add(new InvisibleWall(WIDTH_CASE, 16 * WIDTH_CASE, HEIGHT));
-        listElements.add(new InvisibleWall(WIDTH_CASE, -WIDTH_CASE, 12 * WIDTH_CASE));
-        listElements.add(new InvisibleWall(WIDTH_CASE, -WIDTH_CASE, 14 * WIDTH_CASE));
-        listElements.add(new InvisibleWall(WIDTH_CASE, WIDTH, 12 * WIDTH_CASE));
-        listElements.add(new InvisibleWall(WIDTH_CASE, WIDTH, 14 * WIDTH_CASE));
+        listElements.add(new InvisibleWall(13 * WIDTH_CASE, WIDTH_CASE,  -WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(2 * WIDTH_CASE, WIDTH_CASE,13 * WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(13 * WIDTH_CASE, WIDTH_CASE, 16 * WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(13 * WIDTH_CASE, WIDTH_CASE, -WIDTH_CASE, HEIGHT));
+        listElements.add(new InvisibleWall(2 * WIDTH_CASE, WIDTH_CASE, 13 * WIDTH_CASE, HEIGHT));
+        listElements.add(new InvisibleWall(13 * WIDTH_CASE, WIDTH_CASE, 16 * WIDTH_CASE, HEIGHT));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 14 * WIDTH_CASE, -WIDTH_CASE, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 15 * WIDTH_CASE, -WIDTH_CASE, 14 * WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 14 * WIDTH_CASE, WIDTH, -WIDTH_CASE));
+        listElements.add(new InvisibleWall(WIDTH_CASE, 15 * WIDTH_CASE, WIDTH, 14 * WIDTH_CASE));
 
 
         // PacGum spécial
@@ -354,8 +352,8 @@ public class Labyrinth implements Observer {
     public void updateLabyrinthChange() {
         listElements.set(12, new EmptyCase(WIDTH_CASE, 12 * WIDTH_CASE, WIDTH_CASE));
         listElements.set(15, new EmptyCase(WIDTH_CASE, 15 * WIDTH_CASE, WIDTH_CASE));
-        listElements.set(listElements.size() - 5 - 4 - 12 - 13 - 2, new EmptyCase(WIDTH_CASE, 13 * WIDTH_CASE, 30 * WIDTH_CASE));
-        listElements.set(listElements.size() - 5 - 4 - 12 - 16 - 2, new EmptyCase(WIDTH_CASE, 16 * WIDTH_CASE, 30 * WIDTH_CASE));
+        listElements.set(listElements.size() - 5 - 4 - 12 - 13, new EmptyCase(WIDTH_CASE, 13 * WIDTH_CASE, 30 * WIDTH_CASE));
+        listElements.set(listElements.size() - 5 - 4 - 12 - 16, new EmptyCase(WIDTH_CASE, 16 * WIDTH_CASE, 30 * WIDTH_CASE));
     }
 
     /**

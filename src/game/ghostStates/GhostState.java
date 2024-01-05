@@ -28,8 +28,8 @@ public abstract class GhostState {
      * Méthode pour obtenir la prochaine direction du fantôme en fonction de sa cible
      */
     public void getNextDirection() {
-        int new_xSpd = 0;
-        int new_ySpd = 0;
+        int new_xVel = 0;
+        int new_yVel = 0;
 
         double minDist = Double.MAX_VALUE;
         int[] targetPosition = getTargetPosition();
@@ -37,7 +37,7 @@ public abstract class GhostState {
         if (ghost.getxVel() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, -ghost.getSpd(), 0)) {
             double distance = Utils.getDistance(ghost.getxPos() - ghost.getSpd(), ghost.getyPos(), targetPosition[0], targetPosition[1]);
             if (distance < minDist) {
-                new_xSpd = -ghost.getSpd();
+                new_xVel = -ghost.getSpd();
                 minDist = distance;
             }
         }
@@ -45,7 +45,7 @@ public abstract class GhostState {
         if (ghost.getxVel() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, ghost.getSpd(), 0)) {
             double distance = Utils.getDistance(ghost.getxPos() + ghost.getSpd(), ghost.getyPos(), targetPosition[0], targetPosition[1]);
             if (distance < minDist) {
-                new_xSpd = ghost.getSpd();
+                new_xVel = ghost.getSpd();
                 minDist = distance;
             }
         }
@@ -53,8 +53,8 @@ public abstract class GhostState {
         if (ghost.getyVel() <= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, -ghost.getSpd())) {
             double distance = Utils.getDistance(ghost.getxPos(), ghost.getyPos() - ghost.getSpd(), targetPosition[0], targetPosition[1]);
             if (distance < minDist) {
-                new_xSpd = 0;
-                new_ySpd = -ghost.getSpd();
+                new_xVel = 0;
+                new_yVel = -ghost.getSpd();
                 minDist = distance;
             }
         }
@@ -62,17 +62,16 @@ public abstract class GhostState {
         if (ghost.getyVel() >= 0 && !WallCollisionDetector.checkWallCollision(ghost, 0, ghost.getSpd())) {
             double distance = Utils.getDistance(ghost.getxPos(), ghost.getyPos() + ghost.getSpd(), targetPosition[0], targetPosition[1]);
             if (distance < minDist) {
-                new_xSpd = 0;
-                new_ySpd = ghost.getSpd();
+                new_xVel = 0;
+                new_yVel = ghost.getSpd();
             }
         }
 
-        if (new_xSpd == 0 && new_ySpd == 0) return;
+        if (new_xVel == 0 && new_yVel == 0) return;
 
-        if (!WallCollisionDetector.checkWallCollision(ghost, new_xSpd, new_ySpd)) {
-            ghost.setxVel(new_xSpd);
-            ghost.setyVel(new_ySpd);
-            System.out.println("new_xSpd = " + new_xSpd + " new_ySpd = " + new_ySpd + " ghost = " + ghost);
+        if (!WallCollisionDetector.checkWallCollision(ghost, new_xVel, new_yVel)) {
+            ghost.setxVel(new_xVel);
+            ghost.setyVel(new_yVel);
         } else {
             System.out.println("Collision" + ghost);
             ghost.setxVel(0);

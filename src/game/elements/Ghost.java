@@ -4,8 +4,10 @@ import game.Labyrinth;
 import game.Observer;
 import game.elements.superpacgum.SuperPacGum;
 import game.ghostStates.*;
+import game.utils.WallCollisionDetector;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * Class Ghost
@@ -76,10 +78,24 @@ public class Ghost extends MovingElement implements Observer {
      */
     @Override
     public void render(Graphics2D g) {
+        g.drawImage(createGhostImage(), xPos, yPos, null);
+    }
+
+    private BufferedImage createGhostImage() {
+        BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
         if (state == eatenMode) g.setColor(Color.WHITE);
         else if (state == frightenedMode) g.setColor(Color.BLUE);
         else g.setColor(color);
-        g.fillOval(xPos, yPos, size, size);
+        g.fillRect(0, size / 2, size, size / 2);
+        g.fillArc(0, 0, size, size, 0, 180);
+        g.setColor(Color.WHITE);
+        g.fillOval(size / 4, size / 4, size / 4, size / 4);
+        g.fillOval(size / 2, size / 4, size / 4, size / 4);
+        g.setColor(Color.BLUE);
+        g.fillOval(size / 4 + size / 10, size / 4 + size / 10, size / 8, size / 8);
+        g.fillOval(size / 2 + size / 10, size / 4 + size / 10, size / 8, size / 8);
+        return image;
     }
 
     /**
@@ -102,7 +118,12 @@ public class Ghost extends MovingElement implements Observer {
 
         // Le fantôme calcule sa nouvelle position et est mis à jour
         state.getNextDirection();
-        updatePosition();
+        if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) {
+            updatePosition();
+        } else {
+            xVel = 0;
+            yVel = 0;
+        }
     }
 
     /**

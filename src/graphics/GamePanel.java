@@ -13,7 +13,7 @@ import static java.lang.Thread.sleep;
 /**
  * Class GamePanel
  */
-public class GamePanel extends JPanel implements Runnable {
+public class GamePanel extends JPanel implements Runnable { // TODO : bug lorsque l'on recommence une partie (ecran blanc)
     private final Client client; // Le client
     private static Thread thread; // Le thread
     private static boolean running = false; // true si le jeu est en cours, false sinon
@@ -131,9 +131,6 @@ public class GamePanel extends JPanel implements Runnable {
         int frameCount = 0;
         int lastSecondTime = (int) (lastUpdateTime / 1000000000);
         int oldFrameCount = 0;
-
-        int invisibleTime = 10;
-        int invincibleTime = 10;
 
         while (running) {
             if (labyrinth.isGameOver()) {

@@ -76,7 +76,6 @@ public class Pacman extends MovingElement implements Sujet, Observer {
      */
     @Override
     public void update() {
-        // TODO: Gestion du timer pour les modes invisibles et invincibles et changement d'état
         if (state == invisibleMode) {
             invisibleTimer++;
             if (invisibleTimer >= (60 * 10)) {
