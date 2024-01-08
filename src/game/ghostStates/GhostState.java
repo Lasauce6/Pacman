@@ -27,7 +27,7 @@ public abstract class GhostState {
     /**
      * Méthode pour obtenir la prochaine direction du fantôme en fonction de sa cible
      */
-    public void getNextDirection() {
+    public void getNextDirection() { // TODO : bug : Quand le fantôme est mangé dans une grande ligne, il fait des allers-retours
         int new_xVel = 0;
         int new_yVel = 0;
 
@@ -69,14 +69,8 @@ public abstract class GhostState {
 
         if (new_xVel == 0 && new_yVel == 0) return;
 
-        if (!WallCollisionDetector.checkWallCollision(ghost, new_xVel, new_yVel)) {
-            ghost.setxVel(new_xVel);
-            ghost.setyVel(new_yVel);
-        } else {
-            System.out.println("Collision" + ghost);
-            ghost.setxVel(0);
-            ghost.setyVel(0);
-        }
+        ghost.setxVel(new_xVel);
+        ghost.setyVel(new_yVel);
     }
 
 }

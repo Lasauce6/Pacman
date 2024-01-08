@@ -120,6 +120,7 @@ public class Ghost extends MovingElement implements Observer {
         state.getNextDirection();
         if (!WallCollisionDetector.checkWallCollision(this, xVel, yVel)) {
             updatePosition();
+            updateDirection();
         } else {
             xVel = 0;
             yVel = 0;
